@@ -1,0 +1,91 @@
+name: audio_pipeline
+version: "0.1"
+runtime: frame0
+permissions:
+  camera: false
+  microphone: true
+  network: false
+  file_write: true
+clock:
+  primary: manual
+  fallback: monotonic
+  fixed_step_ns: 16666667
+inputs:
+  microphone:
+    type: audio.input
+    selector:
+      capability: audio.input
+      vendor: frame0.mock
+    mode: stereo_48k
+    params:
+      sample_rate: 48000
+      channels: 2
+      format: f32
+nodes:
+  oscillator:
+    type: audio.generator.oscillator
+    params:
+      waveform: sine
+      frequency_hz: 110.0
+      gain_db: -18.0
+  noise_burst:
+    type: audio.generator.noise
+    params:
+      color: pink
+      trigger: manual
+      duration_ms: 60
+      gain_db: -24.0
+  envelope:
+    type: audio.envelope_follower
+    input: microphone.samples
+    params:
+      attack_ms: 5.0
+      release_ms: 120.0
+      output: rms
+  fft:
+    type: audio.analysis.fft
+    input: microphone.samples
+    params:
+      size: 2048
+      hop: 512
+      window: hann
+      bands: 64
+  mixer:
+    type: audio.mixer
+    inputs:
+      mic: microphone.samples
+      tone: oscillator.samples
+      noise: noise_burst.samples
+    params:
+      output_channels: 2
+      headroom_db: -6.0
+      sends:
+        reverb: -18.0
+  recorder:
+    type: audio.recorder
+    input: mixer.samples
+    params:
+      container: wav
+      path: captures/audio_pipeline/mix.wav
+      sample_rate: 48000
+      channels: 2
+      format: f32
+  meter:
+    type: audio.meter
+    inputs:
+      rms: envelope.rms
+      spectrum: fft.bands
+      output: mixer.samples
+    params:
+      hold_ms: 800
+      peak_decay_db_per_sec: 12.0
+outputs:
+  audio_out:
+    type: audio.output
+    input: mixer.samples
+  analysis_events:
+    type: event.ndjson
+    input: meter.events
+  recording:
+    type: file.output
+    input: recorder.file

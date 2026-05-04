@@ -15,7 +15,7 @@ Loop rule for this checklist:
 
 - [x] C++ integration mechanism and example: C ABI boundary, C++ adapter class, build notes, and scene manifest.
 - [x] Shader and post-processing examples: multipass shader stack, bloom, LUT/color, feedback, and output capture.
-- [ ] Audio-focused samples: input/generator/analyzer/mixer/recorder contracts and inspectable routing.
+- [x] Audio-focused samples: input/generator/analyzer/mixer/recorder contracts and inspectable routing.
 - [ ] Audio-visual relationship samples: beat/onset/FFT/channel mapping to visual params, timeline sync, and replay.
 - [ ] Machine learning samples: model registry, preprocessing, inference, postprocess, multimodal overlays, and deterministic mock outputs.
 - [ ] Apple Native feature samples: AVFoundation, CoreAudio, Core Media I/O Camera Extension, Metal, Core ML, Vision, Audio Unit, and ScreenCaptureKit contracts.
