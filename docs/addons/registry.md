@@ -27,6 +27,7 @@ registry:
 ```bash
 cargo run -p frame0_cli -- schema export addon --json
 cargo run -p frame0_cli -- plugins list --json
+scripts/verify_addon_registry.sh
 ```
 
-Dedicated addon verification commands will build on this registry convention in the next third-party ecosystem steps.
+The registry helper checks that each registered manifest exists, matches its registry id, and passes the package verification flow.

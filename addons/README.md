@@ -21,3 +21,9 @@ Each addon package should include:
 - README documentation for capabilities, permissions, and supported platforms
 
 FRAME0 addon IDs should use reverse-DNS naming. Paths inside manifests should be relative to the addon package root unless the schema explicitly says otherwise.
+
+Verify the registry with:
+
+```bash
+scripts/verify_addon_registry.sh
+```

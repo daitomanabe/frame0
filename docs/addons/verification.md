@@ -3,11 +3,12 @@
 FRAME0 provides a repository-local helper for basic addon package checks:
 
 ```bash
+scripts/verify_addon_registry.sh
 scripts/verify_addon_package.sh addons/org.example.frame0.visual_warp/addon.yaml
 scripts/verify_addon_package.sh addons/org.example.frame0.c_external_gain/addon.yaml
 ```
 
-The helper checks that the manifest has the required addon keys, resolves example scenes relative to the package root, and runs:
+The registry helper verifies every registered package. The package helper checks that the manifest has the required addon keys, resolves example scenes relative to the package root, and runs:
 
 ```bash
 cargo run -q -p frame0_cli -- inspect <example-scene> --json
