@@ -2,6 +2,8 @@
 
 The public native plugin boundary is `native/frame0_plugin_c_api/frame0_plugin_api.h`.
 
+Native processing externals use a separate skeleton at `native/frame0_external_c_api/frame0_external_api.h`. See [Native External C ABI](external-c-abi.md).
+
 Rules:
 
 - `FRAME0_PLUGIN_API_VERSION` must match the runtime.

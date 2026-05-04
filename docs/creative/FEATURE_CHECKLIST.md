@@ -27,7 +27,7 @@ Loop rule for this checklist:
 ## Third-Party Ecosystem
 
 - [x] Addon manifest schema and addon registry convention.
-- [ ] External C ABI skeleton for native externals.
+- [x] External C ABI skeleton for native externals.
 - [ ] Rust addon skeleton with tests.
 - [ ] C/C++ external skeleton with header, build notes, and example entry points.
 - [ ] Example third-party addon/external packages.

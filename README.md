@@ -155,6 +155,7 @@ crates/frame0_plugin_api/     Plugin manifest loading and verification
 crates/frame0_ai_tools/       AI diagnostics, graph diff, scene patch helpers
 schemas/                      JSON Schema v0 files
 native/frame0_plugin_c_api/   Stable C ABI header
+native/frame0_external_c_api/ Stable C ABI skeleton for native externals
 native/frame0_cpp_sdk/        C++ adapter interface
 native/adapters/mock_sdk/     Mock native video/audio SDK plugin
 native/adapters/mock_ml/      Mock native ML plugin
@@ -193,6 +194,7 @@ AI agents should not infer device IDs by name, depend on GUI state, write vendor
 - [CLI Reference](docs/cli-reference.md)
 - [AI Operation Guide](docs/ai/operation-guide.md)
 - [Native C ABI Reference](docs/native/c-abi-reference.md)
+- [Native External C ABI](docs/native/external-c-abi.md)
 - [Native ML Adapter](docs/ml/native-ml-adapter.md)
 - [Plugin And Extension Examples](docs/extensions/plugin-extension-examples.md)
 - [Creative Tool Concept Map](docs/creative/CONCEPT_MAP.md)
