@@ -1,0 +1,92 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://frame0.local/schema/input_event.v0.json",
+  "title": "FRAME0 Input Event Contract v0",
+  "type": "object",
+  "required": ["event", "time", "source", "id"],
+  "properties": {
+    "event": {
+      "enum": [
+        "pointer.down",
+        "pointer.move",
+        "pointer.up",
+        "pointer.scroll",
+        "keyboard.down",
+        "keyboard.up",
+        "midi.note_on",
+        "midi.note_off",
+        "midi.cc",
+        "osc.message",
+        "hid.input",
+        "serial.line",
+        "multitouch.begin",
+        "multitouch.move",
+        "multitouch.end"
+      ]
+    },
+    "time": { "type": "string" },
+    "id": { "type": "string", "minLength": 1 },
+    "source": {
+      "enum": ["mouse", "keyboard", "midi", "osc", "hid", "serial", "multitouch"]
+    },
+    "resource": { "type": "string" },
+    "device": { "type": "string" },
+    "phase": {
+      "enum": ["began", "changed", "ended", "cancelled", "discrete"]
+    },
+    "coordinate_space": {
+      "enum": ["pixels", "normalized", "normalized_window", "world", "surface"]
+    },
+    "position": {
+      "type": "array",
+      "items": { "type": "number" },
+      "minItems": 2,
+      "maxItems": 3
+    },
+    "delta": {
+      "type": "array",
+      "items": { "type": "number" },
+      "minItems": 2,
+      "maxItems": 3
+    },
+    "button": { "type": "string" },
+    "key": { "type": "string" },
+    "modifiers": {
+      "type": "array",
+      "items": { "enum": ["shift", "control", "option", "command", "caps_lock"] }
+    },
+    "channel": { "type": "integer", "minimum": 1, "maximum": 16 },
+    "note": { "type": "integer", "minimum": 0, "maximum": 127 },
+    "controller": { "type": "integer", "minimum": 0, "maximum": 127 },
+    "value": { "type": "number" },
+    "address": { "type": "string" },
+    "arguments": { "type": "array" },
+    "report_id": { "type": "integer", "minimum": 0 },
+    "bytes": {
+      "type": "array",
+      "items": { "type": "integer", "minimum": 0, "maximum": 255 }
+    },
+    "line": { "type": "string" },
+    "touches": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "position"],
+        "properties": {
+          "id": { "type": "integer", "minimum": 0 },
+          "position": {
+            "type": "array",
+            "items": { "type": "number" },
+            "minItems": 2,
+            "maxItems": 3
+          },
+          "force": { "type": "number" },
+          "radius": { "type": "number" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "data": { "type": "object" }
+  },
+  "additionalProperties": false
+}

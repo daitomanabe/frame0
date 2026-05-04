@@ -1,0 +1,119 @@
+name: input_events
+version: "0.1"
+runtime: frame0
+permissions:
+  camera: false
+  microphone: false
+  network: true
+clock:
+  primary: manual
+  fallback: monotonic
+  fixed_step_ns: 16666667
+inputs:
+  mouse:
+    type: input.mouse
+    selector:
+      capability: pointer.mouse
+      vendor: system
+    event_stream: pointer
+    coordinate_space: normalized_window
+    buttons: [left, middle, right]
+  keyboard:
+    type: input.keyboard
+    selector:
+      capability: keyboard
+      vendor: system
+    event_stream: keyboard
+    layout: physical
+  midi_controller:
+    type: input.midi
+    selector:
+      capability: midi.input
+      vendor: coremidi
+    event_stream: midi
+    channels: [1, 2]
+    controls:
+      note: [36, 37, 38, 39]
+      cc: [1, 7, 10, 74]
+  osc_bus:
+    type: input.osc
+    selector:
+      capability: osc.input
+      vendor: udp
+    event_stream: osc
+    host: 127.0.0.1
+    port: 9000
+    addresses:
+      - /frame0/fader
+      - /frame0/trigger
+  hid_panel:
+    type: input.hid
+    selector:
+      capability: hid.input
+      vendor: generic
+    event_stream: hid
+    usage_page: vendor
+    report_ids: [1, 2]
+  serial_sensor:
+    type: input.serial
+    selector:
+      capability: serial.input
+      vendor: usb
+    event_stream: serial
+    baud_rate: 115200
+    framing: newline
+  multitouch_surface:
+    type: input.multitouch
+    selector:
+      capability: touch.multitouch
+      vendor: system
+    event_stream: multitouch
+    max_touches: 10
+    coordinate_space: normalized
+nodes:
+  event_router:
+    type: event.router
+    inputs:
+      mouse: mouse.events
+      keyboard: keyboard.events
+      midi: midi_controller.events
+      osc: osc_bus.events
+      hid: hid_panel.events
+      serial: serial_sensor.events
+      multitouch: multitouch_surface.events
+    routes:
+      - match: pointer.move
+        emit: interaction.pointer
+      - match: keyboard.down
+        emit: interaction.command
+      - match: midi.cc
+        emit: control.continuous
+      - match: osc.message
+        emit: control.remote
+      - match: multitouch.move
+        emit: interaction.gesture
+  state_mapper:
+    type: event.state_mapper
+    input: event_router.events
+    mappings:
+      - from: interaction.pointer.position
+        to: shader.params.pointer
+      - from: control.continuous.value
+        to: shader.params.energy
+      - from: interaction.gesture.touches
+        to: shader.params.touch_count
+  shader:
+    type: render.shader
+    input: state_mapper.state
+    shader: shaders/input_events.msl
+    params:
+      pointer: [0.5, 0.5]
+      energy: 0.0
+      touch_count: 0
+outputs:
+  preview:
+    type: screen
+    input: shader.output
+  events:
+    type: event.ndjson
+    input: event_router.events
