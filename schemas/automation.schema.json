@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://frame0.local/schema/automation.v0.json",
+  "title": "FRAME0 Parameter Automation v0",
+  "type": "object",
+  "required": ["id", "target", "source"],
+  "properties": {
+    "id": { "type": "string" },
+    "target": { "type": "string" },
+    "source": {
+      "type": "object",
+      "required": ["type"],
+      "properties": {
+        "type": { "enum": ["lfo", "envelope", "ramp", "channel", "constant", "preset"] },
+        "shape": { "enum": ["sine", "triangle", "saw", "square", "noise", "adsr", "linear", "step"] },
+        "rate_hz": { "type": "number" },
+        "duration_sec": { "type": "number" },
+        "value": {},
+        "channel": { "type": "string" },
+        "preset": { "type": "string" }
+      },
+      "additionalProperties": true
+    },
+    "mapping": {
+      "type": "object",
+      "properties": {
+        "input_range": {
+          "type": "array",
+          "items": { "type": "number" },
+          "minItems": 2,
+          "maxItems": 2
+        },
+        "output_range": {
+          "type": "array",
+          "items": { "type": "number" },
+          "minItems": 2,
+          "maxItems": 2
+        },
+        "curve": { "enum": ["linear", "exponential", "logarithmic", "smoothstep"] },
+        "clamp": { "type": "boolean" }
+      },
+      "additionalProperties": false
+    },
+    "smoothing": {
+      "type": "object",
+      "properties": {
+        "type": { "enum": ["none", "one_pole", "slew_limit"] },
+        "time_ms": { "type": "number" },
+        "rise_ms": { "type": "number" },
+        "fall_ms": { "type": "number" }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}
+

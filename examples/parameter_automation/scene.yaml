@@ -1,0 +1,58 @@
+name: parameter_automation
+version: "0.1"
+runtime: frame0
+permissions:
+  camera: false
+  microphone: false
+  network: false
+clock:
+  primary: manual
+  fallback: monotonic
+  fixed_step_ns: 16666667
+nodes:
+  shader:
+    type: render.shader
+    shader: shaders/parameter_automation.msl
+    params:
+      intensity: 0.5
+      hue: 210.0
+      feedback: 0.1
+  automation:
+    type: parameter.automation
+    automations:
+      - id: pulse_intensity
+        target: shader.params.intensity
+        source:
+          type: lfo
+          shape: sine
+          rate_hz: 0.2
+        mapping:
+          input_range: [-1.0, 1.0]
+          output_range: [0.15, 1.0]
+          curve: smoothstep
+          clamp: true
+        smoothing:
+          type: one_pole
+          time_ms: 80
+      - id: hue_ramp
+        target: shader.params.hue
+        source:
+          type: ramp
+          shape: linear
+          duration_sec: 12.0
+        mapping:
+          input_range: [0.0, 1.0]
+          output_range: [180.0, 340.0]
+          curve: linear
+          clamp: false
+      - id: feedback_preset
+        target: shader.params.feedback
+        source:
+          type: preset
+          preset: soft_feedback
+          value: 0.18
+outputs:
+  preview:
+    type: screen
+    input: shader.output
+

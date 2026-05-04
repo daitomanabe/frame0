@@ -125,6 +125,7 @@ Included extension examples:
 | `creative_primitives` | Processing/openFrameworks-style draw primitive manifest |
 | `cinder_geometry` | Cinder-style geometry, camera, and material manifest |
 | `operator_network` | TouchDesigner-style TOP/CHOP/DAT operator network manifest |
+| `parameter_automation` | LFO, ramp, smoothing, mapping, and preset automation |
 | `camera_extension_output` | Core Media I/O Camera Extension output contract |
 | `auv3_audio_unit` | Audio Unit v3 parameter-control contract |
 | `extension_multi_output` | Screen + virtual camera + Syphon-style fan-out |

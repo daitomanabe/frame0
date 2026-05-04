@@ -17,7 +17,7 @@ Loop rule for this checklist:
 - [x] Processing/openFrameworks-style scene examples for draw primitives, color, transforms, and animation.
 - [x] Cinder-style geometry and camera/material manifest examples.
 - [x] TouchDesigner-style operator network schema, parameters, channels, and table/texture conventions.
-- [ ] Parameter automation: LFO, envelope, ramp, smoothing, mapping, and presets.
+- [x] Parameter automation: LFO, envelope, ramp, smoothing, mapping, and presets.
 - [ ] Input and event resources: mouse, keyboard, MIDI, OSC, HID, serial, and multitouch contracts.
 - [ ] Timeline and sequencing: clips, cues, keyframes, transport, beats, and deterministic replay.
 - [ ] Media utilities: image sequence, movie, audio buffer, texture feedback, and capture/playback manifests.
