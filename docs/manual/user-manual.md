@@ -111,6 +111,7 @@ contracts.
 Start from the Rust addon skeleton:
 
 ```bash
+frame0 new my_addon --kind addon-rust
 scripts/verify_addon_package.sh templates/addon-rust
 ```
 

@@ -34,6 +34,7 @@ This repository now contains a working FRAME0 v0.1 scaffold built from `frame0_a
 - Machine-readable documentation index via `frame0 docs index --json` and example documentation listing via `frame0 docs examples --json`
 - API compatibility notes for schema, CLI JSON, NDJSON, and native ABI changes
 - Repository example verification helper via `scripts/verify_examples.sh`
+- Addon skeleton generator via `frame0 new <path> --kind addon-rust`
 - Examples: `hello_shader`, `headless_render`, `camera_to_shader`, `audio_reactive`, `mock_sdk_input`, `native_ml`, `creative_primitives`, `cinder_geometry`, `operator_network`, `parameter_automation`, `input_events`, `timeline_sequencing`, `media_utilities`, `visual_nodes`, `cpp_external_bridge`, `shader_post_processing`, `audio_pipeline`, `audio_visual_sync`, `ml_multimodal_pipeline`, `apple_native_features`, `camera_extension_output`, `auv3_audio_unit`, `extension_multi_output`
 - CI workflow for format and tests
 - Unit and integration tests
@@ -67,6 +68,7 @@ cargo run -q -p frame0_cli -- plugins verify plugins/mock/plugin.yaml --json
 cargo run -q -p frame0_cli -- doctor --json
 cargo run -q -p frame0_cli -- docs index --json
 cargo run -q -p frame0_cli -- docs examples --json
+cargo run -q -p frame0_cli -- new /tmp/frame0-addon-smoke --kind addon-rust --force
 cargo run -q -p frame0_cli -- schema export scene --json
 cargo run -q -p frame0_cli -- schema export all --json
 scripts/verify_examples.sh

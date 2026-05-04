@@ -41,6 +41,7 @@ Still intentionally stubbed:
 cargo test --all
 cargo run -p frame0_cli -- --version
 cargo run -p frame0_cli -- doctor --json
+cargo run -p frame0_cli -- new my_addon --kind addon-rust
 ```
 
 Inspect a scene:

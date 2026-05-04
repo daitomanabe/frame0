@@ -7,6 +7,7 @@ Core commands:
 ```bash
 frame0 --version
 frame0 new my_scene
+frame0 new my_addon --kind addon-rust
 frame0 inspect examples/hello_shader/scene.yaml --json
 frame0 inspect examples/camera_extension_output/scene.yaml --json
 frame0 inspect examples/auv3_audio_unit/scene.yaml --json

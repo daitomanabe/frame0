@@ -277,6 +277,9 @@ fn command_new(path: &Path, kind: &str, force: bool, json_output: bool) -> Resul
             fs::create_dir_all(path.join("include"))?;
             fs::write(path.join("README.md"), default_adapter_template())?;
         }
+        "addon-rust" => {
+            copy_template_dir("templates/addon-rust", path)?;
+        }
         other => return Err(anyhow!("unknown template kind '{other}'")),
     }
     let report = json!({ "created": path, "kind": kind });
@@ -663,6 +666,40 @@ fn repo_root() -> PathBuf {
     PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../..")
 }
 
+fn copy_template_dir(relative_source: &str, destination: &Path) -> Result<()> {
+    let source = repo_root().join(relative_source);
+    copy_dir_filtered(&source, destination)
+        .with_context(|| format!("failed to copy template {}", source.display()))
+}
+
+fn copy_dir_filtered(source: &Path, destination: &Path) -> Result<()> {
+    fs::create_dir_all(destination)
+        .with_context(|| format!("failed to create {}", destination.display()))?;
+    for entry in
+        fs::read_dir(source).with_context(|| format!("failed to read {}", source.display()))?
+    {
+        let entry = entry?;
+        let name = entry.file_name();
+        if name.to_string_lossy() == "target" {
+            continue;
+        }
+        let source_path = entry.path();
+        let destination_path = destination.join(&name);
+        if source_path.is_dir() {
+            copy_dir_filtered(&source_path, &destination_path)?;
+        } else {
+            fs::copy(&source_path, &destination_path).with_context(|| {
+                format!(
+                    "failed to copy {} to {}",
+                    source_path.display(),
+                    destination_path.display()
+                )
+            })?;
+        }
+    }
+    Ok(())
+}
+
 fn list_examples() -> Result<Vec<String>> {
     let root = repo_root().join("examples");
     let mut names = Vec::new();
@@ -695,6 +732,7 @@ fn documentation_index() -> Result<Value> {
             "json_global_flag": "--json",
             "event_stream": "frame0 run <scene> --events ndjson",
             "commands": [
+                "new",
                 "doctor",
                 "docs index",
                 "docs examples",

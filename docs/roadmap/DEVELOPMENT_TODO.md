@@ -48,7 +48,7 @@ should be implemented as a small, reviewable change with tests and a push.
 
 ## Third-Party Addons
 
-- [ ] Add addon package generator command.
+- [x] Add addon package generator command.
 - [ ] Add addon registry validation to CI.
 - [ ] Add external C/C++ skeleton smoke tests.
 - [ ] Add sample addon release checklist.

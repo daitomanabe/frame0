@@ -73,7 +73,11 @@ Native SDKs, camera extensions, audio units, and network transports should not b
 
 ## Rust Addons
 
-Start from `templates/addon-rust`.
+Start from `templates/addon-rust`, or generate a copy:
+
+```bash
+frame0 new my_addon --kind addon-rust
+```
 
 Verification:
 

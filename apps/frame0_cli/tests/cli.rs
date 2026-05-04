@@ -1,6 +1,7 @@
 use assert_cmd::Command;
 use predicates::prelude::*;
 use std::path::PathBuf;
+use tempfile::tempdir;
 
 fn repo_path(path: &str) -> String {
     PathBuf::from(env!("CARGO_MANIFEST_DIR"))
@@ -103,6 +104,34 @@ fn docs_examples_include_scene_and_readme_paths() {
         .stdout(predicate::str::contains(
             "examples/audio_visual_sync/README.md",
         ));
+}
+
+#[test]
+fn new_addon_rust_copies_template_without_target() {
+    let temp = tempdir().unwrap();
+    let addon_dir = temp.path().join("my_addon");
+    let addon_dir_str = addon_dir.to_str().unwrap();
+
+    Command::cargo_bin("frame0")
+        .unwrap()
+        .args(["new", addon_dir_str, "--kind", "addon-rust"])
+        .assert()
+        .success()
+        .stdout(predicate::str::contains("created addon-rust"));
+
+    assert!(addon_dir.join("addon.yaml").is_file());
+    assert!(addon_dir.join("Cargo.toml").is_file());
+    assert!(addon_dir.join("src/lib.rs").is_file());
+    assert!(addon_dir.join("examples/basic_scene.yaml").is_file());
+    assert!(!addon_dir.join("target").exists());
+
+    let scene = addon_dir.join("examples/basic_scene.yaml");
+    Command::cargo_bin("frame0")
+        .unwrap()
+        .args(["inspect", scene.to_str().unwrap(), "--json"])
+        .assert()
+        .success()
+        .stdout(predicate::str::contains("\"ok\": true"));
 }
 
 #[test]
