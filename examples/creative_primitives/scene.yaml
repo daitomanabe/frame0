@@ -1,0 +1,64 @@
+name: creative_primitives
+version: "0.1"
+runtime: frame0
+permissions:
+  camera: false
+  microphone: false
+  network: false
+clock:
+  primary: manual
+  fallback: monotonic
+  fixed_step_ns: 16666667
+nodes:
+  background:
+    type: draw.background
+    color:
+      type: color
+      value: [0.02, 0.02, 0.025, 1.0]
+  circle_orbit:
+    type: draw.circle
+    center:
+      type: vec2
+      value: [0.5, 0.5]
+    radius:
+      type: float
+      value: 0.18
+    fill:
+      type: color
+      value: [0.1, 0.7, 1.0, 1.0]
+    transform:
+      translate:
+        type: vec2
+        value: [0.12, 0.0]
+      rotate:
+        source: time.seconds
+        speed: 0.35
+      scale:
+        type: vec2
+        value: [1.0, 1.0]
+  ribbon:
+    type: draw.polyline
+    points:
+      generator: noise_ribbon
+      count: 128
+      noise_seed: 42
+    stroke:
+      type: color
+      value: [1.0, 0.3, 0.15, 1.0]
+    stroke_width:
+      type: float
+      value: 0.006
+  quad_mesh:
+    type: draw.mesh
+    primitive: quad
+    rect:
+      type: rect
+      value: [0.08, 0.08, 0.22, 0.16]
+    fill:
+      type: hsl
+      value: [210.0, 0.6, 0.55]
+outputs:
+  preview:
+    type: screen
+    input: quad_mesh.output
+

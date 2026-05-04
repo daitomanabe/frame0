@@ -14,7 +14,7 @@ Loop rule for this checklist:
 ## Creative Runtime Foundation
 
 - [x] Creative primitives crate: vectors, colors, easing, noise, rects, polylines, meshes, and transforms.
-- [ ] Processing/openFrameworks-style scene examples for draw primitives, color, transforms, and animation.
+- [x] Processing/openFrameworks-style scene examples for draw primitives, color, transforms, and animation.
 - [ ] Cinder-style geometry and camera/material manifest examples.
 - [ ] TouchDesigner-style operator network schema, parameters, channels, and table/texture conventions.
 - [ ] Parameter automation: LFO, envelope, ramp, smoothing, mapping, and presets.
