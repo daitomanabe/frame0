@@ -129,6 +129,7 @@ Included extension examples:
 | `input_events` | Mouse, keyboard, MIDI, OSC, HID, serial, and multitouch event contracts |
 | `timeline_sequencing` | Clips, cues, keyframes, beat tracks, transport, and deterministic replay |
 | `media_utilities` | Image sequence, movie, audio buffer, feedback, capture, and playback manifests |
+| `visual_nodes` | Feedback, instancing, particles, shader passes, text, and 2D/3D composition |
 | `camera_extension_output` | Core Media I/O Camera Extension output contract |
 | `auv3_audio_unit` | Audio Unit v3 parameter-control contract |
 | `extension_multi_output` | Screen + virtual camera + Syphon-style fan-out |

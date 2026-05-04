@@ -1,0 +1,124 @@
+name: visual_nodes
+version: "0.1"
+runtime: frame0
+permissions:
+  camera: false
+  microphone: false
+  network: false
+clock:
+  primary: manual
+  fallback: monotonic
+  fixed_step_ns: 16666667
+nodes:
+  particles:
+    type: visual.particles.gpu
+    id: particles
+    family: particles
+    params:
+      count: 4096
+      spawn: sphere
+      lifetime_sec: 6.0
+      turbulence: 0.35
+    outputs:
+      - name: points
+        resource_type: points
+  instances:
+    type: visual.instancing.mesh
+    id: instances
+    family: instancing
+    inputs:
+      points: particles.points
+    geometry: builtin:cube
+    material: materials/instance_glow.yaml
+    params:
+      scale: 0.025
+      orient_to_velocity: true
+    outputs:
+      - name: mesh
+        resource_type: mesh
+  feedback:
+    type: visual.feedback.texture
+    id: feedback
+    family: feedback
+    params:
+      decay: 0.9
+      transform:
+        translate: [0.002, -0.001]
+        scale: [1.004, 1.004]
+      blend: add
+    outputs:
+      - name: texture
+        resource_type: texture
+  pass_bloom:
+    type: visual.shader_pass
+    id: pass_bloom
+    family: shader_pass
+    inputs:
+      mesh: instances.mesh
+      previous: feedback.texture
+    shader: shaders/bloom_pass.msl
+    params:
+      threshold: 0.72
+      radius: 9.0
+    outputs:
+      - name: texture
+        resource_type: texture
+  title_text:
+    type: visual.text.sdf
+    id: title_text
+    family: text
+    bounds: [0.05, 0.05, 0.9, 0.12]
+    params:
+      text: FRAME0
+      font: assets/fonts/Inter-SemiBold.ttf
+      size_px: 64
+      align: left
+      color: [1.0, 1.0, 1.0, 0.92]
+    outputs:
+      - name: texture
+        resource_type: text
+  comp_2d:
+    type: visual.composition.2d
+    id: comp_2d
+    family: composition_2d
+    inputs:
+      background: pass_bloom.texture
+      text: title_text.texture
+    params:
+      resolution: [1920, 1080]
+      blend_order: [background, text]
+    outputs:
+      - name: texture
+        resource_type: texture
+  camera:
+    type: visual.camera.perspective
+    id: camera
+    family: composition_3d
+    params:
+      fov_degrees: 45.0
+      near: 0.01
+      far: 100.0
+      position: [0.0, 0.0, 5.0]
+      look_at: [0.0, 0.0, 0.0]
+    outputs:
+      - name: camera
+        resource_type: camera
+  comp_3d:
+    type: visual.composition.3d
+    id: comp_3d
+    family: composition_3d
+    inputs:
+      camera: camera.camera
+      scene: instances.mesh
+      overlay: comp_2d.texture
+    params:
+      depth_test: true
+      tone_map: aces
+      output: rgba16f
+    outputs:
+      - name: texture
+        resource_type: texture
+outputs:
+  preview:
+    type: screen
+    input: comp_3d.texture

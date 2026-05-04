@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://frame0.local/schema/visual_node.v0.json",
+  "title": "FRAME0 Visual Node Contract v0",
+  "type": "object",
+  "required": ["id", "family", "type"],
+  "properties": {
+    "id": { "type": "string", "minLength": 1 },
+    "family": {
+      "enum": [
+        "feedback",
+        "instancing",
+        "particles",
+        "shader_pass",
+        "text",
+        "composition_2d",
+        "composition_3d"
+      ]
+    },
+    "type": { "type": "string", "minLength": 1 },
+    "inputs": {
+      "type": "object",
+      "additionalProperties": { "type": "string" }
+    },
+    "outputs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "resource_type"],
+        "properties": {
+          "name": { "type": "string", "minLength": 1 },
+          "resource_type": {
+            "enum": ["texture", "mesh", "points", "text", "camera", "material", "buffer"]
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "params": { "type": "object" },
+    "bounds": {
+      "type": "array",
+      "items": { "type": "number" },
+      "minItems": 4,
+      "maxItems": 6
+    },
+    "shader": { "type": "string" },
+    "geometry": { "type": "string" },
+    "material": { "type": "string" }
+  },
+  "additionalProperties": false
+}

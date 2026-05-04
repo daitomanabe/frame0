@@ -21,7 +21,7 @@ Loop rule for this checklist:
 - [x] Input and event resources: mouse, keyboard, MIDI, OSC, HID, serial, and multitouch contracts.
 - [x] Timeline and sequencing: clips, cues, keyframes, transport, beats, and deterministic replay.
 - [x] Media utilities: image sequence, movie, audio buffer, texture feedback, and capture/playback manifests.
-- [ ] Visual node examples: feedback, instancing, particles, shader passes, text, and 2D/3D composition.
+- [x] Visual node examples: feedback, instancing, particles, shader passes, text, and 2D/3D composition.
 - [ ] Developer-facing docs that map openFrameworks / Processing / Cinder / TouchDesigner concepts to FRAME0.
 
 ## Third-Party Ecosystem
