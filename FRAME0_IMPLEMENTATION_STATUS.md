@@ -29,7 +29,7 @@ This repository now contains a working FRAME0 v0.1 scaffold built from `frame0_a
 - Native plugin C ABI header
 - C++ SDK adapter interface
 - Native external C ABI skeleton and C/C++ external templates
-- AI operation guide, error explanation, fix suggestions, graph diff, and merge-patch helper
+- AI agent operation guide, error explanation, fix suggestions, graph diff, and merge-patch helper
 - Public API documentation, schema reference, user manual, and development TODO checklist
 - Machine-readable documentation index via `frame0 docs index --json` and example documentation listing via `frame0 docs examples --json`
 - API compatibility notes for schema, CLI JSON, NDJSON, and native ABI changes
