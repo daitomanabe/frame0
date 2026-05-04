@@ -1,0 +1,88 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://frame0.local/schema/media_asset.v0.json",
+  "title": "FRAME0 Media Asset Contract v0",
+  "type": "object",
+  "required": ["id", "kind"],
+  "properties": {
+    "id": { "type": "string", "minLength": 1 },
+    "kind": {
+      "enum": [
+        "image_sequence",
+        "movie",
+        "audio_buffer",
+        "texture_feedback",
+        "capture",
+        "playback"
+      ]
+    },
+    "path": { "type": "string" },
+    "pattern": { "type": "string" },
+    "range": {
+      "type": "object",
+      "properties": {
+        "start": { "type": "integer", "minimum": 0 },
+        "end": { "type": "integer", "minimum": 0 },
+        "step": { "type": "integer", "minimum": 1 }
+      },
+      "additionalProperties": false
+    },
+    "frame_rate": { "type": "number" },
+    "loop": { "type": "boolean" },
+    "decode": {
+      "type": "object",
+      "properties": {
+        "pixel_format": { "type": "string" },
+        "color_space": { "type": "string" },
+        "hardware": { "type": "boolean" },
+        "preload": { "type": "boolean" }
+      },
+      "additionalProperties": false
+    },
+    "audio": {
+      "type": "object",
+      "properties": {
+        "sample_rate": { "type": "integer" },
+        "channels": { "type": "integer", "minimum": 1 },
+        "format": { "enum": ["f32", "i16", "i24", "i32"] },
+        "analysis": {
+          "type": "array",
+          "items": { "enum": ["rms", "peak", "fft", "onset", "beat"] }
+        }
+      },
+      "additionalProperties": false
+    },
+    "feedback": {
+      "type": "object",
+      "properties": {
+        "history": { "type": "integer", "minimum": 1 },
+        "decay": { "type": "number" },
+        "blend": { "enum": ["mix", "add", "screen", "multiply", "max"] },
+        "reset_on_seek": { "type": "boolean" }
+      },
+      "additionalProperties": false
+    },
+    "capture": {
+      "type": "object",
+      "properties": {
+        "target": { "type": "string" },
+        "container": { "enum": ["frames", "mov", "mp4", "wav", "ndjson"] },
+        "codec": { "type": "string" },
+        "path": { "type": "string" },
+        "include_events": { "type": "boolean" }
+      },
+      "additionalProperties": false
+    },
+    "playback": {
+      "type": "object",
+      "properties": {
+        "clock": { "enum": ["media_pts", "timeline", "fixed_step"] },
+        "sync": { "enum": ["freewheel", "audio_master", "video_master", "external"] },
+        "drop_policy": { "enum": ["never", "late_frames", "late_audio", "adaptive"] }
+      },
+      "additionalProperties": false
+    },
+    "metadata": { "type": "object" }
+  },
+  "additionalProperties": false
+}

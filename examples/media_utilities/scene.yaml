@@ -1,0 +1,108 @@
+name: media_utilities
+version: "0.1"
+runtime: frame0
+permissions:
+  camera: false
+  microphone: false
+  network: false
+  file_read: true
+  file_write: true
+clock:
+  primary: manual
+  fallback: monotonic
+  fixed_step_ns: 16666667
+inputs:
+  image_sequence:
+    type: media.image_sequence
+    id: plates
+    kind: image_sequence
+    pattern: assets/plates/plate_%05d.exr
+    range:
+      start: 1
+      end: 240
+      step: 1
+    frame_rate: 24.0
+    loop: true
+    decode:
+      pixel_format: rgba16f
+      color_space: aces_cg
+      hardware: true
+      preload: false
+  movie_clip:
+    type: media.movie
+    id: reference_movie
+    kind: movie
+    path: assets/reference.mov
+    loop: true
+    decode:
+      pixel_format: bgra8
+      color_space: rec709
+      hardware: true
+      preload: true
+    playback:
+      clock: media_pts
+      sync: video_master
+      drop_policy: late_frames
+  audio_loop:
+    type: media.audio_buffer
+    id: music_loop
+    kind: audio_buffer
+    path: assets/music_loop.wav
+    loop: true
+    audio:
+      sample_rate: 48000
+      channels: 2
+      format: f32
+      analysis: [rms, peak, fft, beat]
+nodes:
+  feedback_texture:
+    type: media.texture_feedback
+    inputs:
+      source: image_sequence.frames
+      modulation: audio_loop.analysis
+    id: smear_feedback
+    kind: texture_feedback
+    feedback:
+      history: 3
+      decay: 0.82
+      blend: screen
+      reset_on_seek: true
+  composite:
+    type: render.shader
+    inputs:
+      plate: feedback_texture.texture
+      movie: movie_clip.frames
+      audio: audio_loop.analysis
+    shader: shaders/media_composite.msl
+    params:
+      mix: 0.65
+      gain: 1.0
+  capture_manifest:
+    type: media.capture
+    input: composite.output
+    id: render_capture
+    kind: capture
+    capture:
+      target: composite.output
+      container: frames
+      codec: exr16f
+      path: captures/media_utilities/frame_%05d.exr
+      include_events: true
+  playback_manifest:
+    type: media.playback
+    inputs:
+      video: movie_clip.frames
+      audio: audio_loop.samples
+    id: rehearsal_playback
+    kind: playback
+    playback:
+      clock: fixed_step
+      sync: audio_master
+      drop_policy: adaptive
+outputs:
+  preview:
+    type: screen
+    input: composite.output
+  capture:
+    type: media.capture_sink
+    input: capture_manifest.output

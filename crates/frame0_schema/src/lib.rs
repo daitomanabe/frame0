@@ -384,6 +384,7 @@ pub fn schema_names() -> &'static [&'static str] {
         "graph",
         "inference_packet",
         "input_event",
+        "media_asset",
         "ml_model",
         "operator_network",
         "parameter",
@@ -418,6 +419,9 @@ pub fn schema_json(name: &str) -> Result<&'static str, SchemaError> {
         )),
         "input_event" | "input-event" => {
             Ok(include_str!("../../../schemas/input_event.schema.json"))
+        }
+        "media_asset" | "media-asset" => {
+            Ok(include_str!("../../../schemas/media_asset.schema.json"))
         }
         "ml_model" | "ml-model" => Ok(include_str!("../../../schemas/ml_model.schema.json")),
         "operator_network" | "operator-network" => Ok(include_str!(
