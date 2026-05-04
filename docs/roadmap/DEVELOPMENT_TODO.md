@@ -11,6 +11,7 @@ should be implemented as a small, reviewable change with tests and a push.
 - [x] Add an example verification script that checks every `examples/*/scene.yaml`.
 - [x] Add API compatibility notes for future breaking schema changes.
 - [x] Expand public examples with projection, multi-camera, depth, control, typography, dataset, Core ML, and spatial audio scenes.
+- [x] Add deterministic example launch artifacts with HTML preview, launch JSON, frames JSON, and NDJSON events.
 
 ## Runtime And IPC
 

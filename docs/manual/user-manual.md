@@ -68,6 +68,7 @@ validate generated scene manifests before running FRAME0.
 ```bash
 cargo run -p frame0_cli -- examples list --json
 cargo run -p frame0_cli -- examples run audio_visual_sync --frames 4
+cargo run -p frame0_cli -- examples launch projection_mapping --frames 120 --out runs/examples/projection_mapping --json
 scripts/verify_examples.sh
 ```
 
@@ -151,3 +152,18 @@ scripts/verify_examples.sh
 
 The script inspects every `examples/*/scene.yaml` and verifies that the CLI can
 generate the documented example index.
+
+## 13. Launch Example Artifacts
+
+Use `examples launch` when you want concrete files to inspect or open:
+
+```bash
+cargo run -p frame0_cli -- examples launch coreml_style_transfer --frames 120 --out runs/examples/coreml_style_transfer --json
+```
+
+The launch command writes:
+
+- `preview.html`
+- `launch.json`
+- `events.ndjson`
+- `frames.json`

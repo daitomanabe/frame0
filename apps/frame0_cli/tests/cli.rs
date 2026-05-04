@@ -107,6 +107,37 @@ fn docs_examples_include_scene_and_readme_paths() {
 }
 
 #[test]
+fn examples_launch_writes_preview_artifacts() {
+    let temp = tempdir().unwrap();
+    let out_dir = temp.path().join("launch");
+    Command::cargo_bin("frame0")
+        .unwrap()
+        .args([
+            "examples",
+            "launch",
+            "projection_mapping",
+            "--frames",
+            "4",
+            "--out",
+            out_dir.to_str().unwrap(),
+            "--json",
+        ])
+        .assert()
+        .success()
+        .stdout(predicate::str::contains("\"status\": \"launched\""))
+        .stdout(predicate::str::contains("preview.html"));
+
+    assert!(out_dir.join("launch.json").is_file());
+    assert!(out_dir.join("events.ndjson").is_file());
+    assert!(out_dir.join("frames.json").is_file());
+    assert!(out_dir.join("preview.html").is_file());
+
+    let preview = fs::read_to_string(out_dir.join("preview.html")).unwrap();
+    assert!(preview.contains("FRAME0 Example Launch"));
+    assert!(preview.contains("projection_mapping"));
+}
+
+#[test]
 fn new_addon_rust_copies_template_without_target() {
     let temp = tempdir().unwrap();
     let addon_dir = temp.path().join("my_addon");

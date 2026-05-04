@@ -22,10 +22,11 @@ Implemented now:
 - Plugin crash detection and restart supervision smoke path
 - Stream open/start/callback/stop/close smoke path with frame/audio packet capture
 - Native ML plugin contract with deterministic mock inference output
+- Deterministic example launcher that writes runnable HTML previews, launch reports, frame reports, and NDJSON events
 - Core Media I/O Camera Extension, AUv3, and Syphon-style output example manifests
 - Unit and integration tests for the CLI, plugin host, native mock SDK, and native mock ML adapter
 
-Still intentionally stubbed:
+Next native integration work:
 
 - Real Metal command queue, shader compilation, texture pool, GPU timing, and window preview
 - Real AVFoundation camera capture and CVPixelBuffer/CVMetalTexture bridge
@@ -105,9 +106,12 @@ The mock implementation is in [native/adapters/mock_ml](native/adapters/mock_ml)
 
 ## OS Extension Examples
 
-These examples model the FRAME0-side contracts for plugin/extension resources. They do not install signed macOS extension bundles yet.
+These examples run through the deterministic example launcher and materialize the FRAME0-side plugin/extension contracts as launch reports, NDJSON events, and HTML previews.
 
 ```bash
+cargo run -p frame0_cli -- examples launch camera_extension_output --frames 120 --out runs/examples/camera_extension_output --json
+cargo run -p frame0_cli -- examples launch auv3_audio_unit --frames 120 --out runs/examples/auv3_audio_unit --json
+cargo run -p frame0_cli -- examples launch extension_multi_output --frames 120 --out runs/examples/extension_multi_output --json
 cargo run -p frame0_cli -- inspect examples/camera_extension_output/scene.yaml --json
 cargo run -p frame0_cli -- inspect examples/auv3_audio_unit/scene.yaml --json
 cargo run -p frame0_cli -- inspect examples/extension_multi_output/scene.yaml --json
@@ -162,6 +166,7 @@ List examples with:
 
 ```bash
 cargo run -p frame0_cli -- examples list --json
+cargo run -p frame0_cli -- examples launch projection_mapping --frames 120 --out runs/examples/projection_mapping --json
 scripts/verify_examples.sh
 ```
 

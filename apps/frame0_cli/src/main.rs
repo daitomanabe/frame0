@@ -10,6 +10,7 @@ use frame0_plugin_api::{list_plugins, load_plugin_manifest, verify_plugin};
 use frame0_render::{empty_texture_pool_stats, render_capabilities, simulate_headless_frames};
 use frame0_schema::{
     load_json_value, load_scene, schema_json, schema_names, ErrorEnvelope, Frame0Diagnostic,
+    SceneManifest,
 };
 use frame0_time::DEFAULT_FIXED_STEP_NS;
 use serde::Serialize;
@@ -212,6 +213,13 @@ enum ExamplesCommand {
         name: String,
         #[arg(long, default_value_t = 3)]
         frames: u64,
+    },
+    Launch {
+        name: String,
+        #[arg(long, default_value_t = 120)]
+        frames: u64,
+        #[arg(long)]
+        out: Option<PathBuf>,
     },
 }
 
@@ -605,7 +613,102 @@ fn command_examples(command: ExamplesCommand, json_output: bool) -> Result<()> {
             }
             command_run(&path, false, Some("ndjson"), frames, json_output)
         }
+        ExamplesCommand::Launch { name, frames, out } => {
+            command_examples_launch(&name, frames, out.as_deref(), json_output)
+        }
     }
+}
+
+fn command_examples_launch(
+    name: &str,
+    frames: u64,
+    out: Option<&Path>,
+    json_output: bool,
+) -> Result<()> {
+    let scene_path = repo_root().join("examples").join(name).join("scene.yaml");
+    if !scene_path.is_file() {
+        return Err(anyhow!("example '{name}' not found"));
+    }
+    let scene = load_scene(&scene_path)?;
+    let mut diagnostics = scene.validate();
+    diagnostics.extend(resolve_required_devices(&scene));
+    let ok = diagnostics.iter().all(|item| !is_error(item));
+    if !ok {
+        return Err(anyhow!(
+            "example '{name}' has diagnostics; run frame0 inspect"
+        ));
+    }
+
+    let output_dir = out
+        .map(Path::to_path_buf)
+        .unwrap_or_else(|| repo_root().join("runs").join("examples").join(name));
+    fs::create_dir_all(&output_dir)
+        .with_context(|| format!("failed to create {}", output_dir.display()))?;
+
+    let graph = build_graph(&scene);
+    let dry_report = dry_run(&scene);
+    let step_ns = scene.clock.fixed_step_ns.unwrap_or(DEFAULT_FIXED_STEP_NS);
+    let rendered_frames = simulate_headless_frames(frames, step_ns, 1920, 1080);
+    let run_events = simulated_run_events(&scene, frames);
+    let launch_report = json!({
+        "example": name,
+        "scene_path": path_for_report(&scene_path),
+        "output_dir": path_for_report(&output_dir),
+        "backend": "deterministic_example_runtime",
+        "status": "launched",
+        "frames_requested": frames,
+        "artifacts": {
+            "preview_html": "preview.html",
+            "launch_json": "launch.json",
+            "events_ndjson": "events.ndjson",
+            "frames_json": "frames.json"
+        },
+        "scene": scene,
+        "graph": graph,
+        "dry_run": dry_report,
+        "run_events": run_events,
+        "render_frames": rendered_frames,
+        "devices": mock_devices(),
+        "adapter_status": example_adapter_status(&load_scene(&scene_path)?),
+    });
+
+    let launch_path = output_dir.join("launch.json");
+    let events_path = output_dir.join("events.ndjson");
+    let frames_path = output_dir.join("frames.json");
+    let preview_path = output_dir.join("preview.html");
+
+    fs::write(&launch_path, serde_json::to_vec_pretty(&launch_report)?)
+        .with_context(|| format!("failed to write {}", launch_path.display()))?;
+    fs::write(&frames_path, serde_json::to_vec_pretty(&rendered_frames)?)
+        .with_context(|| format!("failed to write {}", frames_path.display()))?;
+    let events_ndjson = run_events
+        .iter()
+        .map(serde_json::to_string)
+        .collect::<std::result::Result<Vec<_>, _>>()?
+        .join("\n");
+    fs::write(&events_path, format!("{events_ndjson}\n"))
+        .with_context(|| format!("failed to write {}", events_path.display()))?;
+    fs::write(
+        &preview_path,
+        example_preview_html(name, &load_scene(&scene_path)?, &launch_report)?,
+    )
+    .with_context(|| format!("failed to write {}", preview_path.display()))?;
+
+    let report = json!({
+        "example": name,
+        "status": "launched",
+        "backend": "deterministic_example_runtime",
+        "output_dir": path_for_report(&output_dir),
+        "preview_html": path_for_report(&preview_path),
+        "launch_json": path_for_report(&launch_path),
+        "events_ndjson": path_for_report(&events_path),
+        "frames_json": path_for_report(&frames_path),
+    });
+    print_value(
+        &report,
+        json_output,
+        format!("launched example {name}: {}", preview_path.display()),
+    )
 }
 
 fn command_benchmark(scene_path: &Path, frames: u64, json_output: bool) -> Result<()> {
@@ -750,6 +853,7 @@ fn documentation_index() -> Result<Value> {
                 "suggest",
                 "scene patch",
                 "examples",
+                "examples launch",
                 "benchmark",
                 "logs"
             ]
@@ -787,6 +891,216 @@ fn example_docs() -> Result<Vec<Value>> {
         })
         .collect();
     Ok(examples)
+}
+
+fn path_for_report(path: &Path) -> String {
+    path.strip_prefix(repo_root())
+        .unwrap_or(path)
+        .display()
+        .to_string()
+}
+
+fn example_adapter_status(scene: &SceneManifest) -> Vec<Value> {
+    let mut components = Vec::new();
+    for (kind, items) in [
+        ("input", &scene.inputs),
+        ("node", &scene.nodes),
+        ("output", &scene.outputs),
+    ] {
+        for (id, component) in items {
+            components.push(json!({
+                "id": id,
+                "kind": kind,
+                "type": component.component_type,
+                "capability": component
+                    .selector
+                    .as_ref()
+                    .and_then(|selector| selector.capability.clone()),
+                "vendor": component
+                    .selector
+                    .as_ref()
+                    .and_then(|selector| selector.vendor.clone()),
+                "runtime_adapter": adapter_runtime_name(&component.component_type),
+                "status": "simulated_active"
+            }));
+        }
+    }
+    components
+}
+
+fn adapter_runtime_name(component_type: &str) -> &'static str {
+    if component_type.starts_with("apple.") {
+        "apple_native_sim"
+    } else if component_type.starts_with("ml.") {
+        "native_ml_sim"
+    } else if component_type.starts_with("audio.") {
+        "audio_sim"
+    } else if component_type.starts_with("video.") || component_type.starts_with("depth.") {
+        "media_io_sim"
+    } else if component_type.starts_with("extension.")
+        || component_type.contains("camera_extension")
+    {
+        "extension_output_sim"
+    } else if component_type.starts_with("render.") || component_type.starts_with("geometry.") {
+        "render_sim"
+    } else if component_type.starts_with("input.") || component_type.starts_with("control.") {
+        "control_sim"
+    } else {
+        "frame0_runtime_sim"
+    }
+}
+
+fn example_preview_html(name: &str, scene: &SceneManifest, report: &Value) -> Result<String> {
+    let graph = report.get("graph").cloned().unwrap_or_else(|| json!({}));
+    let events = report
+        .get("run_events")
+        .cloned()
+        .unwrap_or_else(|| json!([]));
+    let adapters = report
+        .get("adapter_status")
+        .cloned()
+        .unwrap_or_else(|| json!([]));
+    let outputs = serde_json::to_string_pretty(&scene.outputs)?;
+    let graph_json = serde_json::to_string_pretty(&graph)?;
+    let events_json = serde_json::to_string_pretty(&events)?;
+    let adapters_json = serde_json::to_string_pretty(&adapters)?;
+    Ok(format!(
+        r#"<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FRAME0 Example Launch - {name}</title>
+<style>
+:root {{
+  color-scheme: dark;
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: #101214;
+  color: #eef2f3;
+}}
+body {{
+  margin: 0;
+  min-height: 100vh;
+  background:
+    linear-gradient(135deg, rgba(42, 92, 122, 0.32), transparent 46%),
+    linear-gradient(315deg, rgba(178, 122, 62, 0.24), transparent 44%),
+    #101214;
+}}
+main {{
+  width: min(1180px, calc(100vw - 40px));
+  margin: 0 auto;
+  padding: 34px 0 48px;
+}}
+header {{
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 18px;
+  align-items: start;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.16);
+  padding-bottom: 22px;
+}}
+h1 {{
+  font-size: 28px;
+  line-height: 1.1;
+  margin: 0 0 10px;
+  letter-spacing: 0;
+}}
+p {{
+  margin: 0;
+  color: #b8c1c5;
+}}
+.badge {{
+  padding: 8px 11px;
+  border: 1px solid rgba(118, 214, 164, 0.45);
+  background: rgba(44, 149, 91, 0.18);
+  color: #9cf0bd;
+  border-radius: 6px;
+  font-size: 13px;
+}}
+.grid {{
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  margin-top: 22px;
+}}
+section {{
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(12, 15, 17, 0.78);
+  border-radius: 8px;
+  overflow: hidden;
+}}
+section h2 {{
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin: 0;
+  padding: 14px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  color: #d9e5e8;
+}}
+pre {{
+  margin: 0;
+  padding: 16px;
+  overflow: auto;
+  max-height: 420px;
+  font-size: 12px;
+  line-height: 1.45;
+  color: #dce7ea;
+}}
+@media (max-width: 760px) {{
+  header, .grid {{
+    grid-template-columns: 1fr;
+  }}
+}}
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <div>
+      <h1>{title}</h1>
+      <p>Deterministic FRAME0 example launch. Generated artifacts: launch.json, events.ndjson, frames.json.</p>
+    </div>
+    <div class="badge">simulated_active</div>
+  </header>
+  <div class="grid">
+    <section>
+      <h2>Outputs</h2>
+      <pre>{outputs}</pre>
+    </section>
+    <section>
+      <h2>Adapters</h2>
+      <pre>{adapters}</pre>
+    </section>
+    <section>
+      <h2>Graph</h2>
+      <pre>{graph}</pre>
+    </section>
+    <section>
+      <h2>Events</h2>
+      <pre>{events}</pre>
+    </section>
+  </div>
+</main>
+</body>
+</html>
+"#,
+        name = html_escape(name),
+        title = html_escape(&scene.name),
+        outputs = html_escape(&outputs),
+        adapters = html_escape(&adapters_json),
+        graph = html_escape(&graph_json),
+        events = html_escape(&events_json),
+    ))
+}
+
+fn html_escape(input: &str) -> String {
+    input
+        .replace('&', "&amp;")
+        .replace('<', "&lt;")
+        .replace('>', "&gt;")
+        .replace('"', "&quot;")
+        .replace('\'', "&#39;")
 }
 
 fn default_scene_template() -> &'static str {

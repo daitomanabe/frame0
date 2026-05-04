@@ -39,6 +39,7 @@ frame0 suggest fix examples/hello_shader/scene.yaml --json
 frame0 scene patch scene.yaml patch.json --json
 frame0 examples list --json
 frame0 examples run audio_visual_sync --frames 4
+frame0 examples launch projection_mapping --frames 120 --out runs/examples/projection_mapping --json
 frame0 benchmark examples/hello_shader/scene.yaml --json
 scripts/verify_examples.sh
 ```

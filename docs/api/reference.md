@@ -24,6 +24,7 @@ frame0 docs examples --json
 frame0 schema list --json
 frame0 schema export all --json
 frame0 examples list --json
+frame0 examples launch projection_mapping --frames 120 --out runs/examples/projection_mapping --json
 ```
 
 Command errors are process failures with a readable stderr message. Structured
