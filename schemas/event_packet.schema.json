@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://frame0.local/schema/event_packet.v0.json",
+  "title": "FRAME0 EventPacket v0",
+  "type": "object",
+  "required": ["event", "time"],
+  "properties": {
+    "event": { "type": "string" },
+    "time": { "type": "string" },
+    "id": { "type": "string" },
+    "frame": { "type": "integer" },
+    "code": { "type": "string" },
+    "resource": { "type": "string" },
+    "data": { "type": "object" }
+  },
+  "additionalProperties": true
+}
+

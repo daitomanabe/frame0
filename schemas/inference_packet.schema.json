@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://frame0.local/schema/inference_packet.v0.json",
+  "title": "FRAME0 InferencePacket v0",
+  "type": "object",
+  "required": ["type", "model_id", "backend", "pts_ns", "duration_ns", "outputs"],
+  "properties": {
+    "type": { "const": "ml.inference" },
+    "model_id": { "type": "string" },
+    "backend": { "type": "string" },
+    "pts_ns": { "type": "integer" },
+    "duration_ns": { "type": "integer" },
+    "input_ref": { "type": "string" },
+    "outputs": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "diagnostics": {
+      "type": "array",
+      "items": { "$ref": "error.schema.json" }
+    }
+  },
+  "additionalProperties": false
+}
+

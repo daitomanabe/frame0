@@ -1,0 +1,30 @@
+plugin:
+  id: io.frame0.extension.auv3.mock
+  version: 0.1.0
+  type: audio_unit
+  entry:
+    macos_arm64: Frame0AudioUnitExtension.appex
+    macos_x86_64: Frame0AudioUnitExtension.appex
+    dev: Frame0AudioUnitExtension.appex
+  api_version: 1
+  capabilities:
+    - audio.input
+    - audio.output
+    - os.audio_unit
+    - extension.input
+    - extension.output
+    - auv3.parameter
+    - auv3.midi
+  isolation:
+    process: separate
+    restart_policy: never
+  permissions:
+    microphone: true
+    file_read: true
+  vendor:
+    extension_kind: audio_unit_v3
+    bundle_id: ws.frame0.examples.audio-unit-extension
+    component_type: aufx
+    component_subtype: fr0m
+    component_manufacturer: FRM0
+

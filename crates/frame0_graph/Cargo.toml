@@ -1,0 +1,13 @@
+[package]
+name = "frame0_graph"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+frame0_schema = { path = "../frame0_schema" }
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+

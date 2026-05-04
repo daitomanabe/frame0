@@ -1,0 +1,11 @@
+{
+  "bundle": "frame0_ai_bundle",
+  "version": "0.1",
+  "date": "2026-05-03",
+  "files": [
+    "FRAME0_AI_SPECIFICATION.md",
+    "FRAME0_DEVELOPMENT_PLAN.md",
+    "FRAME0_TODO_CHECKLIST.md",
+    "README.md"
+  ]
+}

@@ -1,0 +1,32 @@
+[package]
+name = "frame0_cli"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[[bin]]
+name = "frame0"
+path = "src/main.rs"
+
+[dependencies]
+anyhow.workspace = true
+clap.workspace = true
+frame0_ai_tools = { path = "../../crates/frame0_ai_tools" }
+frame0_core = { path = "../../crates/frame0_core" }
+frame0_device = { path = "../../crates/frame0_device" }
+frame0_graph = { path = "../../crates/frame0_graph" }
+frame0_plugin_api = { path = "../../crates/frame0_plugin_api" }
+frame0_render = { path = "../../crates/frame0_render" }
+frame0_schema = { path = "../../crates/frame0_schema" }
+frame0_time = { path = "../../crates/frame0_time" }
+serde.workspace = true
+serde_json.workspace = true
+serde_yaml.workspace = true
+time.workspace = true
+
+[dev-dependencies]
+assert_cmd.workspace = true
+predicates.workspace = true
+tempfile.workspace = true
+

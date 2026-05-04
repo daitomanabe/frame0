@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://frame0.local/schema/ml_model.v0.json",
+  "title": "FRAME0 ML Model v0",
+  "type": "object",
+  "required": ["id", "backend", "inputs", "outputs", "capabilities"],
+  "properties": {
+    "id": { "type": "string", "minLength": 1 },
+    "backend": {
+      "enum": ["coreml", "mps", "ane", "bnns", "accelerate", "native_mock", "external"]
+    },
+    "model_path": { "type": "string" },
+    "precision": { "enum": ["fp32", "fp16", "int8", "uint8", "mixed"] },
+    "inputs": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/tensor" }
+    },
+    "outputs": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/tensor" }
+    },
+    "capabilities": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "permissions": { "$ref": "permission.schema.json" },
+    "vendor_properties": { "type": "object" }
+  },
+  "$defs": {
+    "tensor": {
+      "type": "object",
+      "required": ["name", "dtype", "shape"],
+      "properties": {
+        "name": { "type": "string" },
+        "dtype": { "enum": ["f32", "f16", "i32", "i64", "u8", "i8", "bool"] },
+        "shape": {
+          "type": "array",
+          "items": { "type": "integer" }
+        },
+        "semantic": {
+          "enum": ["image", "audio", "tensor", "embedding", "classification", "mask", "pose", "depth"]
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}
+

@@ -1,0 +1,53 @@
+name: extension_multi_output
+version: "0.1"
+runtime: frame0
+permissions:
+  camera: true
+  microphone: false
+  network: false
+  file_read: true
+clock:
+  primary: manual
+  fallback: monotonic
+  fixed_step_ns: 16666667
+inputs:
+  mock_video:
+    type: device.video_input
+    selector:
+      capability: video.input
+      vendor: frame0.mock
+    mode: 1080p60
+nodes:
+  video_texture:
+    type: media.texture_from_video
+    input: mock_video.video
+  look:
+    type: render.shader
+    shader: shaders/extension_multi_output.msl
+    inputs:
+      image: video_texture.texture
+outputs:
+  preview:
+    type: screen
+    input: look.output
+  virtual_camera:
+    type: os.camera_extension
+    plugin: io.frame0.extension.camera.mock
+    input: look.output
+    extension:
+      kind: coremediaio.camera_extension
+      bundle_id: ws.frame0.examples.virtual-camera-extension
+      transport:
+        type: iosurface
+        pixel_format: bgra8unorm
+  syphon:
+    type: syphon.output
+    plugin: io.frame0.extension.syphon.mock
+    input: look.output
+    extension:
+      kind: syphon
+      bundle_id: ws.frame0.examples.syphon-output
+      transport:
+        type: iosurface
+        pixel_format: bgra8unorm
+

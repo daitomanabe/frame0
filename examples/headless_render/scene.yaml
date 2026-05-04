@@ -1,0 +1,22 @@
+name: headless_render
+version: "0.1"
+runtime: frame0
+permissions:
+  camera: false
+  microphone: false
+  network: false
+  file_write: true
+clock:
+  primary: fixed_step
+  fallback: monotonic
+  fixed_step_ns: 16666667
+nodes:
+  shader:
+    type: render.shader
+    shader: shaders/headless.msl
+outputs:
+  frames:
+    type: file.image_sequence
+    input: shader.output
+    path: out/headless_render
+

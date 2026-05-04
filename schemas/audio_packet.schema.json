@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://frame0.local/schema/audio_packet.v0.json",
+  "title": "FRAME0 AudioPacket v0",
+  "type": "object",
+  "required": ["type", "stream_id", "pts_ns", "duration_ns", "sample_rate", "channels", "frames"],
+  "properties": {
+    "type": { "const": "audio.packet" },
+    "stream_id": { "type": "string" },
+    "pts_ns": { "type": "integer" },
+    "duration_ns": { "type": "integer" },
+    "sample_rate": { "type": "integer" },
+    "channels": { "type": "integer" },
+    "frames": { "type": "integer" },
+    "format": { "type": "string" },
+    "storage": { "type": "object" }
+  },
+  "additionalProperties": false
+}
+

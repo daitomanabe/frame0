@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://frame0.local/schema/permission.v0.json",
+  "title": "FRAME0 Permission Set v0",
+  "type": "object",
+  "properties": {
+    "camera": { "type": "boolean" },
+    "microphone": { "type": "boolean" },
+    "network": { "type": "boolean" },
+    "file_read": { "type": "boolean" },
+    "file_write": { "type": "boolean" }
+  },
+  "additionalProperties": false
+}
+

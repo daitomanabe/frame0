@@ -1,0 +1,36 @@
+[workspace]
+members = [
+  "apps/frame0_cli",
+  "apps/frame0_plugin_host",
+  "crates/frame0_ai_tools",
+  "crates/frame0_core",
+  "crates/frame0_device",
+  "crates/frame0_graph",
+  "crates/frame0_plugin_api",
+  "crates/frame0_render",
+  "crates/frame0_schema",
+  "crates/frame0_time",
+  "native/adapters/mock_ml",
+  "native/adapters/mock_sdk",
+]
+resolver = "2"
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+repository = "https://example.invalid/frame0"
+rust-version = "1.82"
+
+[workspace.dependencies]
+anyhow = "1"
+assert_cmd = "2"
+clap = { version = "4", features = ["derive", "env"] }
+libloading = "0.8"
+predicates = "3"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+serde_yaml = "0.9"
+tempfile = "3"
+thiserror = "2"
+time = { version = "0.3", features = ["formatting", "macros", "serde"] }

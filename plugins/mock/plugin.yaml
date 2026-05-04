@@ -1,0 +1,24 @@
+plugin:
+  id: io.frame0.mock.sdk
+  version: 0.1.0
+  type: native
+  entry:
+    macos_arm64: ../../target/debug/libframe0_mock_sdk.dylib
+    macos_x86_64: ../../target/debug/libframe0_mock_sdk.dylib
+    linux_x86_64: ../../target/debug/libframe0_mock_sdk.so
+    linux_aarch64: ../../target/debug/libframe0_mock_sdk.so
+    dev: ../../target/debug/libframe0_mock_sdk.dylib
+  api_version: 1
+  capabilities:
+    - video.input
+    - audio.input
+    - timecode.input
+  isolation:
+    process: separate
+    restart_policy: on_crash
+  permissions:
+    camera: true
+    microphone: true
+  vendor:
+    sdk_name: FRAME0 Mock SDK
+    sdk_version: 0.1.0

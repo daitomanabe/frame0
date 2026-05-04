@@ -1,0 +1,59 @@
+name: auv3_audio_unit
+version: "0.1"
+runtime: frame0
+permissions:
+  camera: false
+  microphone: true
+  network: false
+  file_read: true
+clock:
+  primary: audio.input.main
+  fallback: monotonic
+  fixed_step_ns: 16666667
+inputs:
+  audio_main:
+    type: device.audio_input
+    selector:
+      capability: audio.input
+      vendor: frame0.mock
+  auv3_control:
+    type: os.audio_unit
+    plugin: io.frame0.extension.auv3.mock
+    selector:
+      capability: os.audio_unit
+    extension:
+      kind: audio_unit_v3
+      bundle_id: ws.frame0.examples.audio-unit-extension
+      transport:
+        type: auv3_parameter
+        audio_format: float32_interleaved
+        clock: audio.input.main
+nodes:
+  fft:
+    type: audio.fft
+    input: audio_main.audio
+    window_size: 1024
+  parameter_mapper:
+    type: control.auv3_parameter_mapper
+    inputs:
+      fft: fft.bands
+      auv3: auv3_control.parameters
+    mappings:
+      - source: fft.low
+        target: cutoff
+        scale: exponential
+      - source: fft.mid
+        target: resonance
+        scale: linear
+outputs:
+  audio_unit:
+    type: os.audio_unit
+    plugin: io.frame0.extension.auv3.mock
+    input: parameter_mapper.parameters
+    extension:
+      kind: audio_unit_v3
+      bundle_id: ws.frame0.examples.audio-unit-extension
+      transport:
+        type: auv3_parameter
+        clock: audio.input.main
+

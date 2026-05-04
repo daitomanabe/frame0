@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://frame0.local/schema/device.v0.json",
+  "title": "FRAME0 Device v0",
+  "type": "object",
+  "required": ["id", "type", "vendor", "capabilities", "status", "process", "permissions", "modes"],
+  "properties": {
+    "id": { "type": "string" },
+    "type": { "type": "string" },
+    "vendor": { "type": "string" },
+    "capabilities": { "type": "array", "items": { "type": "string" } },
+    "status": { "type": "string" },
+    "process": { "type": "string" },
+    "permissions": { "type": "array", "items": { "type": "string" } },
+    "modes": { "type": "array", "items": { "$ref": "#/$defs/mode" } }
+  },
+  "$defs": {
+    "mode": {
+      "type": "object",
+      "required": ["id"],
+      "properties": {
+        "id": { "type": "string" },
+        "width": { "type": "integer" },
+        "height": { "type": "integer" },
+        "fps": { "type": "number" },
+        "sample_rate": { "type": "integer" },
+        "channels": { "type": "integer" }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}
+

@@ -1,0 +1,16 @@
+[package]
+name = "frame0_core"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+frame0_device = { path = "../frame0_device" }
+frame0_graph = { path = "../frame0_graph" }
+frame0_schema = { path = "../frame0_schema" }
+frame0_time = { path = "../frame0_time" }
+serde.workspace = true
+serde_json.workspace = true
+time.workspace = true
+

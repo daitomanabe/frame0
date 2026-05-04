@@ -1,0 +1,32 @@
+name: audio_reactive
+version: "0.1"
+runtime: frame0
+permissions:
+  camera: false
+  microphone: true
+  network: false
+clock:
+  primary: audio.input.main
+  fallback: monotonic
+  fixed_step_ns: 16666667
+inputs:
+  audio_main:
+    type: device.audio_input
+    selector:
+      capability: audio.input
+      vendor: frame0.mock
+nodes:
+  fft:
+    type: audio.fft
+    input: audio_main.audio
+    window_size: 1024
+  reactive_shader:
+    type: render.shader
+    shader: shaders/audio_reactive.msl
+    inputs:
+      audio: fft.bands
+outputs:
+  preview:
+    type: screen
+    input: reactive_shader.output
+

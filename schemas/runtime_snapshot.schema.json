@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://frame0.local/schema/runtime_snapshot.v0.json",
+  "title": "FRAME0 Runtime Snapshot v0",
+  "type": "object",
+  "required": ["runtime", "scene", "resources", "graph", "clock", "stats"],
+  "properties": {
+    "runtime": { "type": "object" },
+    "scene": { "type": "object" },
+    "resources": { "type": "array", "items": { "$ref": "resource.schema.json" } },
+    "graph": { "$ref": "graph.schema.json" },
+    "clock": { "type": "object" },
+    "stats": { "type": "object" }
+  },
+  "additionalProperties": false
+}
+

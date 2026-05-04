@@ -1,0 +1,33 @@
+name: camera_to_shader
+version: "0.1"
+runtime: frame0
+permissions:
+  camera: true
+  microphone: false
+  network: false
+clock:
+  primary: video.camera.main
+  fallback: monotonic
+  fixed_step_ns: 16666667
+inputs:
+  camera_a:
+    type: device.video_input
+    selector:
+      capability: video.input
+      vendor: frame0.mock
+    mode: 1080p60
+    pixel_format: auto
+nodes:
+  camera_texture:
+    type: media.texture_from_video
+    input: camera_a.video
+  shader:
+    type: render.shader
+    shader: shaders/camera_to_shader.msl
+    inputs:
+      image: camera_texture.texture
+outputs:
+  preview:
+    type: screen
+    input: shader.output
+

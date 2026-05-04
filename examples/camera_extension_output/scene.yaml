@@ -1,0 +1,53 @@
+name: camera_extension_output
+version: "0.1"
+runtime: frame0
+permissions:
+  camera: true
+  microphone: false
+  network: false
+  file_read: true
+clock:
+  primary: video.camera.main
+  fallback: monotonic
+  fixed_step_ns: 16666667
+inputs:
+  camera_a:
+    type: device.video_input
+    selector:
+      capability: video.input
+      vendor: frame0.mock
+    mode: 1080p60
+nodes:
+  camera_texture:
+    type: media.texture_from_video
+    input: camera_a.video
+  output_shader:
+    type: render.shader
+    shader: shaders/virtual_camera_output.msl
+    inputs:
+      image: camera_texture.texture
+outputs:
+  preview:
+    type: screen
+    input: output_shader.output
+  virtual_camera:
+    type: os.camera_extension
+    plugin: io.frame0.extension.camera.mock
+    input: output_shader.output
+    extension:
+      kind: coremediaio.camera_extension
+      bundle_id: ws.frame0.examples.virtual-camera-extension
+      transport:
+        type: iosurface
+        pixel_format: bgra8unorm
+        clock: video.camera.main
+      lifecycle:
+        install_required: true
+        activation_required: true
+        restart_required: false
+    output_format:
+      width: 1920
+      height: 1080
+      fps: 60
+      color_space: rec709
+

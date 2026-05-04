@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://frame0.local/schema/parameter.v0.json",
+  "title": "FRAME0 Parameter v0",
+  "type": "object",
+  "required": ["id", "type", "value"],
+  "properties": {
+    "id": { "type": "string" },
+    "type": { "enum": ["float", "int", "bool", "string", "vec2", "vec3", "vec4", "color"] },
+    "value": {},
+    "min": {},
+    "max": {},
+    "default": {}
+  },
+  "additionalProperties": false
+}
+

@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://frame0.local/schema/frame_packet.v0.json",
+  "title": "FRAME0 FramePacket v0",
+  "type": "object",
+  "required": ["type", "stream_id", "pts_ns", "duration_ns", "frame_index", "width", "height", "pixel_format", "storage"],
+  "properties": {
+    "type": { "const": "video.frame" },
+    "stream_id": { "type": "string" },
+    "pts_ns": { "type": "integer" },
+    "duration_ns": { "type": "integer" },
+    "frame_index": { "type": "integer" },
+    "width": { "type": "integer" },
+    "height": { "type": "integer" },
+    "pixel_format": { "type": "string" },
+    "color_space": { "type": "string" },
+    "transfer_function": { "type": "string" },
+    "range": { "type": "string" },
+    "field_order": { "type": "string" },
+    "storage": { "$ref": "#/$defs/storage" }
+  },
+  "$defs": {
+    "storage": {
+      "type": "object",
+      "required": ["type"],
+      "properties": {
+        "type": { "enum": ["cpu_buffer", "cv_pixel_buffer", "iosurface", "metal_texture", "external_handle", "compressed_packet"] },
+        "handle": { "type": "string" },
+        "size_bytes": { "type": "integer" }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}
+

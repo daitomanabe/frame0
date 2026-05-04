@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://frame0.local/schema/extension.v0.json",
+  "title": "FRAME0 OS Extension v0",
+  "type": "object",
+  "required": ["id", "kind", "bundle_id", "capabilities", "transport"],
+  "properties": {
+    "id": { "type": "string", "minLength": 1 },
+    "kind": {
+      "enum": [
+        "coremediaio.camera_extension",
+        "audio_unit_v3",
+        "driverkit",
+        "system_extension",
+        "syphon",
+        "ndi"
+      ]
+    },
+    "bundle_id": { "type": "string", "minLength": 1 },
+    "team_id": { "type": "string" },
+    "capabilities": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 1
+    },
+    "permissions": { "$ref": "permission.schema.json" },
+    "transport": {
+      "type": "object",
+      "required": ["type"],
+      "properties": {
+        "type": {
+          "enum": ["iosurface", "cmsamplebuffer", "xpc", "auv3_parameter", "shared_memory", "network"]
+        },
+        "pixel_format": { "type": "string" },
+        "audio_format": { "type": "string" },
+        "clock": { "type": "string" }
+      },
+      "additionalProperties": true
+    },
+    "lifecycle": {
+      "type": "object",
+      "properties": {
+        "install_required": { "type": "boolean" },
+        "activation_required": { "type": "boolean" },
+        "restart_required": { "type": "boolean" }
+      },
+      "additionalProperties": false
+    },
+    "vendor_properties": { "type": "object" }
+  },
+  "additionalProperties": false
+}

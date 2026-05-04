@@ -1,0 +1,27 @@
+plugin:
+  id: io.frame0.extension.camera.mock
+  version: 0.1.0
+  type: camera_extension
+  entry:
+    macos_arm64: Frame0VirtualCameraExtension.appex
+    macos_x86_64: Frame0VirtualCameraExtension.appex
+    dev: Frame0VirtualCameraExtension.appex
+  api_version: 1
+  capabilities:
+    - video.output
+    - os.camera_extension
+    - extension.output
+    - iosurface.import
+    - coremedia.sample_buffer
+  isolation:
+    process: separate
+    restart_policy: never
+  permissions:
+    camera: true
+    file_read: true
+  vendor:
+    extension_kind: coremediaio.camera_extension
+    bundle_id: ws.frame0.examples.virtual-camera-extension
+    transport: iosurface_to_cmsamplebuffer
+    note: Stub manifest for Core Media I/O Camera Extension output examples.
+

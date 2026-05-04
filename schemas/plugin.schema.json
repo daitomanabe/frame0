@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://frame0.local/schema/plugin.v0.json",
+  "title": "FRAME0 Plugin Manifest v0",
+  "type": "object",
+  "required": ["plugin"],
+  "properties": {
+    "plugin": {
+      "type": "object",
+      "required": ["id", "version", "type", "entry", "api_version", "capabilities", "isolation", "permissions"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "version": { "type": "string", "minLength": 1 },
+        "type": { "enum": ["native", "wasm", "script", "os_extension", "audio_unit", "camera_extension", "system_extension"] },
+        "entry": {
+          "type": "object",
+          "additionalProperties": { "type": "string" }
+        },
+        "api_version": { "type": "integer", "minimum": 1 },
+        "capabilities": {
+          "type": "array",
+          "items": { "type": "string" },
+          "minItems": 1
+        },
+        "isolation": {
+          "type": "object",
+          "required": ["process", "restart_policy"],
+          "properties": {
+            "process": { "enum": ["separate", "in_process"] },
+            "restart_policy": { "enum": ["never", "on_crash"] }
+          },
+          "additionalProperties": false
+        },
+        "permissions": { "$ref": "permission.schema.json" },
+        "vendor": { "type": "object" }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

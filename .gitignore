@@ -1,0 +1,9 @@
+/target/
+/frame0_ai_bundle.zip
+/.DS_Store
+/.idea/
+/.vscode/
+/.next/
+*.log
+*.tmp
+*.dSYM/

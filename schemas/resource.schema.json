@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://frame0.local/schema/resource.v0.json",
+  "title": "FRAME0 Resource v0",
+  "type": "object",
+  "required": ["id", "type", "capabilities", "status", "process", "permissions"],
+  "properties": {
+    "id": { "type": "string", "minLength": 1 },
+    "type": { "type": "string", "minLength": 1 },
+    "vendor": { "type": "string" },
+    "capabilities": { "type": "array", "items": { "type": "string" } },
+    "status": { "enum": ["created", "resolved", "opening", "active", "paused", "failed", "closed", "available", "unavailable"] },
+    "process": { "type": "string" },
+    "permissions": { "type": "array", "items": { "type": "string" } },
+    "owner": { "type": "string" },
+    "dependencies": { "type": "array", "items": { "type": "string" } },
+    "vendor_properties": { "type": "object" }
+  },
+  "additionalProperties": false
+}
+

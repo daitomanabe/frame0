@@ -1,0 +1,23 @@
+plugin:
+  id: io.frame0.extension.syphon.mock
+  version: 0.1.0
+  type: os_extension
+  entry:
+    macos_arm64: libframe0_syphon_output.dylib
+    macos_x86_64: libframe0_syphon_output.dylib
+    dev: libframe0_syphon_output.dylib
+  api_version: 1
+  capabilities:
+    - video.output
+    - syphon.output
+    - extension.output
+    - iosurface.import
+  isolation:
+    process: separate
+    restart_policy: on_crash
+  permissions:
+    file_read: true
+  vendor:
+    extension_kind: syphon
+    server_name: FRAME0 Mock Syphon Output
+
