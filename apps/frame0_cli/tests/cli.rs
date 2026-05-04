@@ -104,6 +104,7 @@ fn extension_examples_inspect_cleanly() {
         "examples/audio_pipeline/scene.yaml",
         "examples/audio_visual_sync/scene.yaml",
         "examples/ml_multimodal_pipeline/scene.yaml",
+        "examples/apple_native_features/scene.yaml",
     ] {
         let scene = repo_path(example);
         Command::cargo_bin("frame0")

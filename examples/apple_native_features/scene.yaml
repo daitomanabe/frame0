@@ -1,0 +1,121 @@
+name: apple_native_features
+version: "0.1"
+runtime: frame0
+permissions:
+  camera: true
+  microphone: true
+  network: false
+  file_read: true
+  file_write: true
+clock:
+  primary: manual
+  fallback: monotonic
+  fixed_step_ns: 16666667
+inputs:
+  avfoundation_camera:
+    type: apple.avfoundation.camera
+    selector:
+      capability: video.input
+      vendor: apple.avfoundation
+    mode: 1080p60
+    params:
+      pixel_buffer: CVPixelBuffer
+      texture_bridge: CVMetalTextureCache
+      color_space: display_p3
+  coreaudio_input:
+    type: apple.coreaudio.input
+    selector:
+      capability: audio.input
+      vendor: apple.coreaudio
+    mode: stereo_48k
+    params:
+      sample_rate: 48000
+      channels: 2
+      format: f32
+  screencapturekit_display:
+    type: apple.screencapturekit.display
+    selector:
+      capability: screen.capture
+      vendor: apple.screencapturekit
+    params:
+      display: main
+      pixel_format: bgra8
+      queue_depth: 3
+nodes:
+  metal_preprocess:
+    type: apple.metal.compute
+    inputs:
+      camera: avfoundation_camera.video
+      screen: screencapturekit_display.frames
+    shader: shaders/apple/metal_preprocess.msl
+    params:
+      command_queue: shared
+      texture_pool: iosurface
+      output_pixel_format: rgba16f
+  vision_landmarks:
+    type: apple.vision.face_landmarks
+    input: avfoundation_camera.video
+    params:
+      revision: current
+      maximum_faces: 4
+      output: normalized_landmarks
+  coreml_classifier:
+    type: apple.coreml.inference
+    input: metal_preprocess.texture
+    model: mock_classifier
+    params:
+      compute_units: all
+      precision: fp16
+      output: classifications
+  mps_segmentation:
+    type: apple.mpsgraph.inference
+    input: metal_preprocess.texture
+    model: mock_segmentation
+    params:
+      device: default_mtl_device
+      output: mask
+  auv3_parameter_bridge:
+    type: apple.audio_unit_v3.parameter_bridge
+    inputs:
+      audio: coreaudio_input.samples
+      landmarks: vision_landmarks.landmarks
+    selector:
+      capability: auv3.parameter
+      vendor: apple.audio_unit
+    params:
+      parameters:
+        cutoff: vision_landmarks.face_0.mouth_open
+        resonance: coreaudio_input.level
+  camera_extension_output:
+    type: apple.coremediaio.camera_extension_output
+    inputs:
+      texture: metal_preprocess.texture
+      overlay: vision_landmarks.landmarks
+      inference: coreml_classifier.output
+    selector:
+      capability: os.camera_extension
+      vendor: apple.coremediaio
+    params:
+      stream_id: frame0.virtual.camera.apple_native
+      sample_buffer: CMSampleBuffer
+      timestamp_source: host_time
+  composite:
+    type: render.shader
+    inputs:
+      camera: metal_preprocess.texture
+      screen: screencapturekit_display.frames
+      landmarks: vision_landmarks.landmarks
+      classes: coreml_classifier.output
+      mask: mps_segmentation.mask
+      auv3: auv3_parameter_bridge.parameters
+    shader: shaders/apple/native_feature_composite.msl
+outputs:
+  preview:
+    type: screen
+    input: composite.output
+  virtual_camera:
+    type: extension.output
+    input: camera_extension_output.stream
+  events:
+    type: event.ndjson
+    input: composite.events

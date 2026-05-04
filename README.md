@@ -135,6 +135,7 @@ Included extension examples:
 | `audio_pipeline` | Audio input, generator, analyzer, mixer, recorder, meter, and output routing |
 | `audio_visual_sync` | Beat, onset, FFT, and envelope mapping into visual parameters and replay |
 | `ml_multimodal_pipeline` | Model registry, video/audio preprocessing, native mock inference, postprocess, and overlay |
+| `apple_native_features` | AVFoundation, CoreAudio, ScreenCaptureKit, Metal, Vision, Core ML, AUv3, and Camera Extension contracts |
 | `camera_extension_output` | Core Media I/O Camera Extension output contract |
 | `auv3_audio_unit` | Audio Unit v3 parameter-control contract |
 | `extension_multi_output` | Screen + virtual camera + Syphon-style fan-out |
@@ -209,6 +210,7 @@ AI agents should not infer device IDs by name, depend on GUI state, write vendor
 - [Audio Pipeline Sample](docs/audio/audio-pipeline.md)
 - [Audio Visual Sync Sample](docs/audio/audio-visual-sync.md)
 - [Shader And Post-Processing Examples](docs/rendering/shader-post-processing.md)
+- [Apple Native Feature Samples](docs/apple/native-feature-samples.md)
 - [Plugin And Extension Examples](docs/extensions/plugin-extension-examples.md)
 - [Creative Tool Concept Map](docs/creative/CONCEPT_MAP.md)
 - [Creative Parity Checklist](docs/creative/FEATURE_CHECKLIST.md)

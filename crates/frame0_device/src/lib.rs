@@ -214,6 +214,23 @@ pub fn mock_devices() -> Vec<DeviceResource> {
             }],
         },
         DeviceResource {
+            id: "device.screen_capture.mock.0".to_string(),
+            device_type: "device.screen_capture".to_string(),
+            vendor: "frame0.mock".to_string(),
+            capabilities: vec!["screen.capture".to_string(), "video.input".to_string()],
+            status: "available".to_string(),
+            process: "plugin_host.mock_screen_capture".to_string(),
+            permissions: vec!["file_read".to_string()],
+            modes: vec![DeviceMode {
+                id: "display_main_bgra8".to_string(),
+                width: Some(1920),
+                height: Some(1080),
+                fps: Some(60.0),
+                sample_rate: None,
+                channels: None,
+            }],
+        },
+        DeviceResource {
             id: "extension.audio_unit.mock.0".to_string(),
             device_type: "extension.audio_unit".to_string(),
             vendor: "frame0.mock".to_string(),
@@ -293,6 +310,7 @@ mod tests {
             "hid.input",
             "serial.input",
             "touch.multitouch",
+            "screen.capture",
         ] {
             assert!(
                 !devices_with_capability(capability).is_empty(),
