@@ -133,6 +133,7 @@ Included extension examples:
 | `cpp_external_bridge` | C++ native external through the stable C ABI |
 | `shader_post_processing` | Multipass shader stack with bloom, LUT color, feedback, and capture |
 | `audio_pipeline` | Audio input, generator, analyzer, mixer, recorder, meter, and output routing |
+| `audio_visual_sync` | Beat, onset, FFT, and envelope mapping into visual parameters and replay |
 | `camera_extension_output` | Core Media I/O Camera Extension output contract |
 | `auv3_audio_unit` | Audio Unit v3 parameter-control contract |
 | `extension_multi_output` | Screen + virtual camera + Syphon-style fan-out |
@@ -205,6 +206,7 @@ AI agents should not infer device IDs by name, depend on GUI state, write vendor
 - [C++ Integration Mechanism](docs/native/cpp-integration.md)
 - [Native ML Adapter](docs/ml/native-ml-adapter.md)
 - [Audio Pipeline Sample](docs/audio/audio-pipeline.md)
+- [Audio Visual Sync Sample](docs/audio/audio-visual-sync.md)
 - [Shader And Post-Processing Examples](docs/rendering/shader-post-processing.md)
 - [Plugin And Extension Examples](docs/extensions/plugin-extension-examples.md)
 - [Creative Tool Concept Map](docs/creative/CONCEPT_MAP.md)

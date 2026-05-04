@@ -1,0 +1,120 @@
+name: audio_visual_sync
+version: "0.1"
+runtime: frame0
+permissions:
+  camera: false
+  microphone: true
+  network: false
+  file_write: true
+clock:
+  primary: manual
+  fallback: monotonic
+  fixed_step_ns: 16666667
+inputs:
+  audio:
+    type: audio.input
+    selector:
+      capability: audio.input
+      vendor: frame0.mock
+    mode: stereo_48k
+nodes:
+  beat_tracker:
+    type: audio.analysis.beat
+    input: audio.samples
+    params:
+      bpm_hint: 124.0
+      confidence_threshold: 0.6
+      output_phase: true
+  onset_detector:
+    type: audio.analysis.onset
+    input: audio.samples
+    params:
+      bands: [low, mid, high]
+      sensitivity: 0.72
+      refractory_ms: 90
+  spectrum:
+    type: audio.analysis.fft
+    input: audio.samples
+    params:
+      size: 2048
+      hop: 512
+      bands: 32
+      scale: mel
+  envelope:
+    type: audio.envelope_follower
+    input: audio.samples
+    params:
+      attack_ms: 4
+      release_ms: 160
+  mapper:
+    type: av.parameter_mapper
+    inputs:
+      beat: beat_tracker.phase
+      onsets: onset_detector.events
+      spectrum: spectrum.bands
+      envelope: envelope.rms
+    mappings:
+      - from: beat.phase
+        to: instancer.params.rotation_phase
+        curve: linear
+        range: [0.0, 6.283185]
+      - from: envelope.rms
+        to: post.params.exposure
+        curve: smoothstep
+        range: [-0.2, 0.5]
+      - from: spectrum.band_08
+        to: particles.params.turbulence
+        curve: exponential
+        range: [0.05, 0.9]
+      - from: onsets.low
+        to: post.params.flash
+        trigger: pulse
+        decay_ms: 120
+  timeline:
+    type: timeline.sequence
+    input: beat_tracker.transport
+    transport:
+      mode: external
+      timebase: beats
+      bpm: 124.0
+      loop: true
+      start: 0
+      end: 64
+    replay:
+      deterministic: true
+      seed: 404
+      event_log: captures/audio_visual_sync/events.ndjson
+      clock: fixed_step
+  particles:
+    type: visual.particles.gpu
+    input: mapper.params
+    params:
+      count: 8192
+      turbulence: 0.2
+      birth_on: onset_detector.events
+  instancer:
+    type: visual.instancing.mesh
+    inputs:
+      points: particles.points
+      control: mapper.params
+    params:
+      geometry: builtin:icosahedron
+      rotation_phase: 0.0
+      scale: 0.018
+  post:
+    type: render.post_process
+    inputs:
+      scene: instancer.mesh
+      control: mapper.params
+    shader: shaders/audio_visual_post.msl
+    params:
+      exposure: 0.0
+      flash: 0.0
+      color_mode: spectrum_gradient
+outputs:
+  preview:
+    type: screen
+    input: post.texture
+  av_events:
+    type: event.ndjson
+    input: mapper.events
