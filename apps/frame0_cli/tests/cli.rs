@@ -92,6 +92,7 @@ fn extension_examples_inspect_cleanly() {
         "examples/auv3_audio_unit/scene.yaml",
         "examples/extension_multi_output/scene.yaml",
         "examples/creative_primitives/scene.yaml",
+        "examples/cinder_geometry/scene.yaml",
     ] {
         let scene = repo_path(example);
         Command::cargo_bin("frame0")

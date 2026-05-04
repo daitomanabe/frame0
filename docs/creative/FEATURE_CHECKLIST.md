@@ -15,7 +15,7 @@ Loop rule for this checklist:
 
 - [x] Creative primitives crate: vectors, colors, easing, noise, rects, polylines, meshes, and transforms.
 - [x] Processing/openFrameworks-style scene examples for draw primitives, color, transforms, and animation.
-- [ ] Cinder-style geometry and camera/material manifest examples.
+- [x] Cinder-style geometry and camera/material manifest examples.
 - [ ] TouchDesigner-style operator network schema, parameters, channels, and table/texture conventions.
 - [ ] Parameter automation: LFO, envelope, ramp, smoothing, mapping, and presets.
 - [ ] Input and event resources: mouse, keyboard, MIDI, OSC, HID, serial, and multitouch contracts.

@@ -123,6 +123,7 @@ Included extension examples:
 | `mock_sdk_input` | Mock native SDK video/audio input scene |
 | `native_ml` | Native ML tensor/inference/overlay graph |
 | `creative_primitives` | Processing/openFrameworks-style draw primitive manifest |
+| `cinder_geometry` | Cinder-style geometry, camera, and material manifest |
 | `camera_extension_output` | Core Media I/O Camera Extension output contract |
 | `auv3_audio_unit` | Audio Unit v3 parameter-control contract |
 | `extension_multi_output` | Screen + virtual camera + Syphon-style fan-out |

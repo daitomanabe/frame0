@@ -1,0 +1,52 @@
+name: cinder_geometry
+version: "0.1"
+runtime: frame0
+permissions:
+  camera: false
+  microphone: false
+  network: false
+clock:
+  primary: manual
+  fallback: monotonic
+  fixed_step_ns: 16666667
+nodes:
+  perspective_camera:
+    type: render.camera
+    camera:
+      projection: perspective
+      fov_y_degrees: 45
+      near: 0.01
+      far: 100.0
+      transform:
+        position: [0.0, 1.5, 4.0]
+        target: [0.0, 0.0, 0.0]
+        up: [0.0, 1.0, 0.0]
+  torus_mesh:
+    type: geometry.mesh
+    primitive: torus
+    parameters:
+      major_radius: 1.0
+      minor_radius: 0.18
+      radial_segments: 96
+      tube_segments: 24
+    transform:
+      rotate_y:
+        source: time.seconds
+        speed: 0.25
+  material:
+    type: render.material
+    model: pbr
+    base_color: [0.1, 0.42, 1.0, 1.0]
+    roughness: 0.28
+    metallic: 0.05
+    normal_source: generated
+  draw_torus:
+    type: render.draw_mesh
+    inputs:
+      mesh: torus_mesh.mesh
+      material: material.material
+      camera: perspective_camera.camera
+outputs:
+  preview:
+    type: screen
+    input: draw_torus.output
