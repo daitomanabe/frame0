@@ -8,7 +8,7 @@ should be implemented as a small, reviewable change with tests and a push.
 - [x] Add public API documentation for CLI, schemas, resources, plugins, native ABI, ML, and addons.
 - [x] Add a user manual that explains the current development workflow.
 - [x] Add a machine-readable documentation index exposed by the CLI.
-- [ ] Add an example verification script that checks every `examples/*/scene.yaml`.
+- [x] Add an example verification script that checks every `examples/*/scene.yaml`.
 - [ ] Add API compatibility notes for future breaking schema changes.
 
 ## Runtime And IPC

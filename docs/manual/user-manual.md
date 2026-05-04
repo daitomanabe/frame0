@@ -68,6 +68,7 @@ validate generated scene manifests before running FRAME0.
 ```bash
 cargo run -p frame0_cli -- examples list --json
 cargo run -p frame0_cli -- examples run audio_visual_sync --frames 4
+scripts/verify_examples.sh
 ```
 
 Important example groups:
@@ -136,3 +137,14 @@ frame0 suggest fix path/to/scene.yaml --json
 
 Do not use plain text logs as the only source of truth when JSON or NDJSON is
 available.
+
+## 12. Verify Public Examples
+
+Before publishing changes to example scenes, run:
+
+```bash
+scripts/verify_examples.sh
+```
+
+The script inspects every `examples/*/scene.yaml` and verifies that the CLI can
+generate the documented example index.

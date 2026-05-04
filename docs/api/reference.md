@@ -184,3 +184,9 @@ Addon verification starts with:
 ```bash
 scripts/verify_addon_package.sh templates/addon-rust
 ```
+
+Repository example verification starts with:
+
+```bash
+scripts/verify_examples.sh
+```

@@ -153,6 +153,7 @@ List examples with:
 
 ```bash
 cargo run -p frame0_cli -- examples list --json
+scripts/verify_examples.sh
 ```
 
 ## Repository Layout
@@ -182,6 +183,7 @@ templates/external-cpp/       C++ external adapter template behind the C ABI
 plugins/                      Plugin and extension manifests
 examples/                     CLI-testable scene manifests
 docs/                         ADRs, operation guides, native/ML/extension docs
+scripts/verify_examples.sh    Example scene verification helper
 ```
 
 ## AI Operation Contract
