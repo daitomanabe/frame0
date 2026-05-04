@@ -158,6 +158,7 @@ native/frame0_plugin_c_api/   Stable C ABI header
 native/frame0_cpp_sdk/        C++ adapter interface
 native/adapters/mock_sdk/     Mock native video/audio SDK plugin
 native/adapters/mock_ml/      Mock native ML plugin
+addons/                       Third-party addon registry convention
 plugins/                      Plugin and extension manifests
 examples/                     CLI-testable scene manifests
 docs/                         ADRs, operation guides, native/ML/extension docs
@@ -196,6 +197,7 @@ AI agents should not infer device IDs by name, depend on GUI state, write vendor
 - [Plugin And Extension Examples](docs/extensions/plugin-extension-examples.md)
 - [Creative Tool Concept Map](docs/creative/CONCEPT_MAP.md)
 - [Creative Parity Checklist](docs/creative/FEATURE_CHECKLIST.md)
+- [Addon Registry Convention](docs/addons/registry.md)
 - [Implementation Status](FRAME0_IMPLEMENTATION_STATUS.md)
 - [Architecture Decisions](docs/adr)
 

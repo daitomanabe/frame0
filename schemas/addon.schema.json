@@ -1,0 +1,93 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://frame0.local/schema/addon.v0.json",
+  "title": "FRAME0 Addon Manifest v0",
+  "type": "object",
+  "required": ["addon"],
+  "properties": {
+    "addon": {
+      "type": "object",
+      "required": [
+        "id",
+        "name",
+        "version",
+        "api_version",
+        "kind",
+        "capabilities",
+        "entrypoints",
+        "permissions",
+        "examples",
+        "tests"
+      ],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "name": { "type": "string", "minLength": 1 },
+        "version": { "type": "string", "minLength": 1 },
+        "api_version": { "type": "integer", "minimum": 1 },
+        "kind": {
+          "enum": ["rust_crate", "native_external", "wasm", "script", "schema_pack", "asset_pack"]
+        },
+        "description": { "type": "string" },
+        "license": { "type": "string" },
+        "homepage": { "type": "string" },
+        "repository": { "type": "string" },
+        "capabilities": {
+          "type": "array",
+          "items": { "type": "string" },
+          "minItems": 1
+        },
+        "entrypoints": {
+          "type": "object",
+          "properties": {
+            "rust_crate": { "type": "string" },
+            "native_library": {
+              "type": "object",
+              "additionalProperties": { "type": "string" }
+            },
+            "wasm_module": { "type": "string" },
+            "schemas": {
+              "type": "array",
+              "items": { "type": "string" }
+            },
+            "assets": {
+              "type": "array",
+              "items": { "type": "string" }
+            }
+          },
+          "additionalProperties": false
+        },
+        "permissions": { "$ref": "permission.schema.json" },
+        "parameters": {
+          "type": "array",
+          "items": { "$ref": "parameter.schema.json" }
+        },
+        "examples": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "tests": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "compatibility": {
+          "type": "object",
+          "properties": {
+            "frame0": { "type": "string" },
+            "platforms": {
+              "type": "array",
+              "items": { "type": "string" }
+            },
+            "features": {
+              "type": "array",
+              "items": { "type": "string" }
+            }
+          },
+          "additionalProperties": false
+        },
+        "vendor": { "type": "object" }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

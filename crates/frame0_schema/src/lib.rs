@@ -373,6 +373,7 @@ pub fn load_json_value(path: impl AsRef<Path>) -> Result<Value, SchemaError> {
 
 pub fn schema_names() -> &'static [&'static str] {
     &[
+        "addon",
         "audio_packet",
         "automation",
         "capability",
@@ -400,6 +401,7 @@ pub fn schema_names() -> &'static [&'static str] {
 
 pub fn schema_json(name: &str) -> Result<&'static str, SchemaError> {
     match name {
+        "addon" => Ok(include_str!("../../../schemas/addon.schema.json")),
         "audio_packet" | "audio-packet" => {
             Ok(include_str!("../../../schemas/audio_packet.schema.json"))
         }
