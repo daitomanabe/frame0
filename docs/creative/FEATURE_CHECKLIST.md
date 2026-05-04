@@ -29,7 +29,7 @@ Loop rule for this checklist:
 - [x] Addon manifest schema and addon registry convention.
 - [x] External C ABI skeleton for native externals.
 - [x] Rust addon skeleton with tests.
-- [ ] C/C++ external skeleton with header, build notes, and example entry points.
+- [x] C/C++ external skeleton with header, build notes, and example entry points.
 - [ ] Example third-party addon/external packages.
 - [ ] Addon authoring guide: packaging, versioning, capabilities, permissions, tests, and examples.
 - [ ] CLI helper commands or documented flows for verifying addon/external packages.
