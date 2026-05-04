@@ -29,15 +29,24 @@ frame0 resource get node.color_shader --scene examples/hello_shader/scene.yaml -
 frame0 doctor --json
 frame0 schema list --json
 frame0 schema export scene --json
+frame0 schema export all --json
 frame0 snapshot runtime --scene examples/hello_shader/scene.yaml --json
 frame0 explain error error.json --json
 frame0 suggest fix examples/hello_shader/scene.yaml --json
 frame0 scene patch scene.yaml patch.json --json
 frame0 examples list --json
+frame0 examples run audio_visual_sync --frames 4
 frame0 benchmark examples/hello_shader/scene.yaml --json
 ```
 
 `run --events ndjson` is the primary AI-readable execution stream.
+
+API and manual documentation:
+
+- [API Documentation](api/README.md)
+- [API Reference](api/reference.md)
+- [Schema Reference](api/schemas.md)
+- [User Manual](manual/user-manual.md)
 
 Native plugin host commands:
 

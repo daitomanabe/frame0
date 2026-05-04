@@ -60,6 +60,13 @@ cargo run -p frame0_cli -- schema export scene --json
 cargo run -p frame0_cli -- snapshot runtime --scene examples/audio_reactive/scene.yaml --json
 ```
 
+Start from the docs map when building against FRAME0:
+
+```bash
+cargo run -p frame0_cli -- schema export all --json
+cargo run -p frame0_cli -- examples list --json
+```
+
 ## Native Plugin Host
 
 Build and smoke-test the mock native SDK plugin:
@@ -201,6 +208,10 @@ AI agents should not infer device IDs by name, depend on GUI state, write vendor
 
 ## Documentation
 
+- [API Documentation](docs/api/README.md)
+- [API Reference](docs/api/reference.md)
+- [Schema Reference](docs/api/schemas.md)
+- [User Manual](docs/manual/user-manual.md)
 - [CLI Reference](docs/cli-reference.md)
 - [AI Operation Guide](docs/ai/operation-guide.md)
 - [Native C ABI Reference](docs/native/c-abi-reference.md)
@@ -215,6 +226,7 @@ AI agents should not infer device IDs by name, depend on GUI state, write vendor
 - [Creative Tool Concept Map](docs/creative/CONCEPT_MAP.md)
 - [Creative Parity Checklist](docs/creative/FEATURE_CHECKLIST.md)
 - [Native Sample TODO Checklist](docs/creative/NATIVE_SAMPLE_TODO.md)
+- [Development TODO Checklist](docs/roadmap/DEVELOPMENT_TODO.md)
 - [Addon Registry Convention](docs/addons/registry.md)
 - [Addon Authoring Guide](docs/addons/authoring-guide.md)
 - [Addon Verification Flow](docs/addons/verification.md)
