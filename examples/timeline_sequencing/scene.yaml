@@ -1,0 +1,107 @@
+name: timeline_sequencing
+version: "0.1"
+runtime: frame0
+permissions:
+  camera: false
+  microphone: false
+  network: false
+clock:
+  primary: manual
+  fallback: monotonic
+  fixed_step_ns: 16666667
+nodes:
+  timeline:
+    type: timeline.sequence
+    id: main_show_timeline
+    transport:
+      mode: playing
+      timebase: beats
+      bpm: 124.0
+      beats_per_bar: 4
+      loop: true
+      start: 0.0
+      end: 64.0
+    tracks:
+      - id: intensity_track
+        type: parameter
+        target: shader.params.intensity
+        clips:
+          - id: intro_pulse
+            start: 0.0
+            duration: 16.0
+            loop: true
+            keyframes:
+              - at: 0.0
+                value: 0.15
+                easing: hold
+              - at: 4.0
+                value: 0.75
+                easing: smoothstep
+              - at: 8.0
+                value: 0.25
+                easing: ease_out
+      - id: cue_track
+        type: event
+        target: event_bus.events
+        clips:
+          - id: drop_cues
+            start: 16.0
+            duration: 32.0
+            keyframes:
+              - at: 16.0
+                value:
+                  event: cue.drop
+                easing: hold
+              - at: 32.0
+                value:
+                  event: cue.break
+                easing: hold
+      - id: beat_track
+        type: beat
+        target: shader.params.beat_phase
+        clips:
+          - id: four_on_floor
+            start: 0.0
+            duration: 4.0
+            loop: true
+            keyframes:
+              - at: 0.0
+                value: 1.0
+                easing: hold
+              - at: 0.5
+                value: 0.0
+                easing: ease_out
+    cues:
+      - id: reset_camera
+        at: 0.0
+        action: set
+        target: camera.pose
+        value: wide
+      - id: blackout
+        at: 63.5
+        action: emit
+        target: event_bus.events
+        value:
+          event: cue.blackout
+    replay:
+      deterministic: true
+      seed: 20260504
+      event_log: captures/timeline_sequencing.ndjson
+      clock: fixed_step
+  event_bus:
+    type: event.bus
+    input: timeline.events
+  shader:
+    type: render.shader
+    input: timeline.state
+    shader: shaders/timeline_sequencing.msl
+    params:
+      intensity: 0.15
+      beat_phase: 0.0
+outputs:
+  preview:
+    type: screen
+    input: shader.output
+  replay_log:
+    type: event.ndjson
+    input: event_bus.events

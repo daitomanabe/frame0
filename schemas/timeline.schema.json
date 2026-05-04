@@ -1,0 +1,97 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://frame0.local/schema/timeline.v0.json",
+  "title": "FRAME0 Timeline Contract v0",
+  "type": "object",
+  "required": ["id", "transport"],
+  "properties": {
+    "id": { "type": "string", "minLength": 1 },
+    "transport": {
+      "type": "object",
+      "required": ["mode", "timebase"],
+      "properties": {
+        "mode": { "enum": ["stopped", "playing", "recording", "external"] },
+        "timebase": { "enum": ["frames", "seconds", "beats", "samples"] },
+        "fps": { "type": "number" },
+        "bpm": { "type": "number" },
+        "beats_per_bar": { "type": "integer", "minimum": 1 },
+        "loop": { "type": "boolean" },
+        "start": { "type": "number" },
+        "end": { "type": "number" }
+      },
+      "additionalProperties": false
+    },
+    "tracks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "type"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "type": { "enum": ["parameter", "event", "media", "scene", "beat"] },
+          "target": { "type": "string" },
+          "clips": {
+            "type": "array",
+            "items": { "$ref": "#/$defs/clip" }
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "cues": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "at"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "at": { "type": "number" },
+          "action": { "enum": ["emit", "jump", "pause", "resume", "set"] },
+          "target": { "type": "string" },
+          "value": {}
+        },
+        "additionalProperties": false
+      }
+    },
+    "replay": {
+      "type": "object",
+      "properties": {
+        "deterministic": { "type": "boolean" },
+        "seed": { "type": "integer" },
+        "event_log": { "type": "string" },
+        "clock": { "enum": ["fixed_step", "recorded_pts", "external"] }
+      },
+      "additionalProperties": false
+    }
+  },
+  "$defs": {
+    "clip": {
+      "type": "object",
+      "required": ["id", "start", "duration"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "start": { "type": "number" },
+        "duration": { "type": "number", "exclusiveMinimum": 0 },
+        "loop": { "type": "boolean" },
+        "source": { "type": "string" },
+        "keyframes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["at", "value"],
+            "properties": {
+              "at": { "type": "number" },
+              "value": {},
+              "easing": {
+                "enum": ["hold", "linear", "smoothstep", "ease_in", "ease_out", "ease_in_out"]
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

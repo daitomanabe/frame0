@@ -392,6 +392,7 @@ pub fn schema_names() -> &'static [&'static str] {
         "resource",
         "runtime_snapshot",
         "scene",
+        "timeline",
     ]
 }
 
@@ -430,6 +431,7 @@ pub fn schema_json(name: &str) -> Result<&'static str, SchemaError> {
             "../../../schemas/runtime_snapshot.schema.json"
         )),
         "scene" => Ok(include_str!("../../../schemas/scene.schema.json")),
+        "timeline" => Ok(include_str!("../../../schemas/timeline.schema.json")),
         other => Err(SchemaError::UnknownSchema(other.to_string())),
     }
 }

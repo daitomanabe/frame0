@@ -127,6 +127,7 @@ Included extension examples:
 | `operator_network` | TouchDesigner-style TOP/CHOP/DAT operator network manifest |
 | `parameter_automation` | LFO, ramp, smoothing, mapping, and preset automation |
 | `input_events` | Mouse, keyboard, MIDI, OSC, HID, serial, and multitouch event contracts |
+| `timeline_sequencing` | Clips, cues, keyframes, beat tracks, transport, and deterministic replay |
 | `camera_extension_output` | Core Media I/O Camera Extension output contract |
 | `auv3_audio_unit` | Audio Unit v3 parameter-control contract |
 | `extension_multi_output` | Screen + virtual camera + Syphon-style fan-out |

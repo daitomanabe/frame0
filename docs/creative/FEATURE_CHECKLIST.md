@@ -19,7 +19,7 @@ Loop rule for this checklist:
 - [x] TouchDesigner-style operator network schema, parameters, channels, and table/texture conventions.
 - [x] Parameter automation: LFO, envelope, ramp, smoothing, mapping, and presets.
 - [x] Input and event resources: mouse, keyboard, MIDI, OSC, HID, serial, and multitouch contracts.
-- [ ] Timeline and sequencing: clips, cues, keyframes, transport, beats, and deterministic replay.
+- [x] Timeline and sequencing: clips, cues, keyframes, transport, beats, and deterministic replay.
 - [ ] Media utilities: image sequence, movie, audio buffer, texture feedback, and capture/playback manifests.
 - [ ] Visual node examples: feedback, instancing, particles, shader passes, text, and 2D/3D composition.
 - [ ] Developer-facing docs that map openFrameworks / Processing / Cinder / TouchDesigner concepts to FRAME0.

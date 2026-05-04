@@ -96,6 +96,7 @@ fn extension_examples_inspect_cleanly() {
         "examples/operator_network/scene.yaml",
         "examples/parameter_automation/scene.yaml",
         "examples/input_events/scene.yaml",
+        "examples/timeline_sequencing/scene.yaml",
     ] {
         let scene = repo_path(example);
         Command::cargo_bin("frame0")
