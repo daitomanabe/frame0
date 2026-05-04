@@ -69,6 +69,8 @@ validate generated scene manifests before running FRAME0.
 cargo run -p frame0_cli -- examples list --json
 cargo run -p frame0_cli -- examples run audio_visual_sync --frames 4
 cargo run -p frame0_cli -- examples launch projection_mapping --frames 120 --out runs/examples/projection_mapping --json
+cargo run -p frame0_cli -- examples launch-all --frames 24 --out runs/examples --json
+scripts/launch_examples.sh
 scripts/verify_examples.sh
 ```
 
@@ -159,6 +161,7 @@ Use `examples launch` when you want concrete files to inspect or open:
 
 ```bash
 cargo run -p frame0_cli -- examples launch coreml_style_transfer --frames 120 --out runs/examples/coreml_style_transfer --json
+cargo run -p frame0_cli -- examples launch-all --frames 24 --out runs/examples --json
 ```
 
 The launch command writes:
@@ -167,3 +170,5 @@ The launch command writes:
 - `launch.json`
 - `events.ndjson`
 - `frames.json`
+
+`launch-all` also writes `index.html` at the output root.

@@ -221,6 +221,12 @@ enum ExamplesCommand {
         #[arg(long)]
         out: Option<PathBuf>,
     },
+    LaunchAll {
+        #[arg(long, default_value_t = 120)]
+        frames: u64,
+        #[arg(long)]
+        out: Option<PathBuf>,
+    },
 }
 
 fn main() {
@@ -616,6 +622,9 @@ fn command_examples(command: ExamplesCommand, json_output: bool) -> Result<()> {
         ExamplesCommand::Launch { name, frames, out } => {
             command_examples_launch(&name, frames, out.as_deref(), json_output)
         }
+        ExamplesCommand::LaunchAll { frames, out } => {
+            command_examples_launch_all(frames, out.as_deref(), json_output)
+        }
     }
 }
 
@@ -625,6 +634,53 @@ fn command_examples_launch(
     out: Option<&Path>,
     json_output: bool,
 ) -> Result<()> {
+    let output_dir = out
+        .map(Path::to_path_buf)
+        .unwrap_or_else(|| repo_root().join("runs").join("examples").join(name));
+    let report = launch_example(name, frames, &output_dir)?;
+    print_value(
+        &report,
+        json_output,
+        format!(
+            "launched example {name}: {}",
+            output_dir.join("preview.html").display()
+        ),
+    )
+}
+
+fn command_examples_launch_all(frames: u64, out: Option<&Path>, json_output: bool) -> Result<()> {
+    let output_root = out
+        .map(Path::to_path_buf)
+        .unwrap_or_else(|| repo_root().join("runs").join("examples"));
+    fs::create_dir_all(&output_root)
+        .with_context(|| format!("failed to create {}", output_root.display()))?;
+
+    let mut launched = Vec::new();
+    for name in list_examples()? {
+        let output_dir = output_root.join(&name);
+        launched.push(launch_example(&name, frames, &output_dir)?);
+    }
+
+    let index_path = output_root.join("index.html");
+    fs::write(&index_path, examples_index_html(&launched)?)
+        .with_context(|| format!("failed to write {}", index_path.display()))?;
+    let count = launched.len();
+    let report = json!({
+        "status": "launched",
+        "backend": "deterministic_example_runtime",
+        "examples": launched,
+        "count": count,
+        "output_dir": path_for_report(&output_root),
+        "index_html": path_for_report(&index_path),
+    });
+    print_value(
+        &report,
+        json_output,
+        format!("launched {count} examples: {}", index_path.display()),
+    )
+}
+
+fn launch_example(name: &str, frames: u64, output_dir: &Path) -> Result<Value> {
     let scene_path = repo_root().join("examples").join(name).join("scene.yaml");
     if !scene_path.is_file() {
         return Err(anyhow!("example '{name}' not found"));
@@ -639,9 +695,6 @@ fn command_examples_launch(
         ));
     }
 
-    let output_dir = out
-        .map(Path::to_path_buf)
-        .unwrap_or_else(|| repo_root().join("runs").join("examples").join(name));
     fs::create_dir_all(&output_dir)
         .with_context(|| format!("failed to create {}", output_dir.display()))?;
 
@@ -650,6 +703,7 @@ fn command_examples_launch(
     let step_ns = scene.clock.fixed_step_ns.unwrap_or(DEFAULT_FIXED_STEP_NS);
     let rendered_frames = simulate_headless_frames(frames, step_ns, 1920, 1080);
     let run_events = simulated_run_events(&scene, frames);
+    let adapter_status = example_adapter_status(&scene);
     let launch_report = json!({
         "example": name,
         "scene_path": path_for_report(&scene_path),
@@ -663,13 +717,13 @@ fn command_examples_launch(
             "events_ndjson": "events.ndjson",
             "frames_json": "frames.json"
         },
-        "scene": scene,
+        "scene": scene.clone(),
         "graph": graph,
         "dry_run": dry_report,
-        "run_events": run_events,
-        "render_frames": rendered_frames,
+        "run_events": run_events.clone(),
+        "render_frames": rendered_frames.clone(),
         "devices": mock_devices(),
-        "adapter_status": example_adapter_status(&load_scene(&scene_path)?),
+        "adapter_status": adapter_status.clone(),
     });
 
     let launch_path = output_dir.join("launch.json");
@@ -690,11 +744,11 @@ fn command_examples_launch(
         .with_context(|| format!("failed to write {}", events_path.display()))?;
     fs::write(
         &preview_path,
-        example_preview_html(name, &load_scene(&scene_path)?, &launch_report)?,
+        example_preview_html(name, &scene, &launch_report)?,
     )
     .with_context(|| format!("failed to write {}", preview_path.display()))?;
 
-    let report = json!({
+    Ok(json!({
         "example": name,
         "status": "launched",
         "backend": "deterministic_example_runtime",
@@ -703,12 +757,7 @@ fn command_examples_launch(
         "launch_json": path_for_report(&launch_path),
         "events_ndjson": path_for_report(&events_path),
         "frames_json": path_for_report(&frames_path),
-    });
-    print_value(
-        &report,
-        json_output,
-        format!("launched example {name}: {}", preview_path.display()),
-    )
+    }))
 }
 
 fn command_benchmark(scene_path: &Path, frames: u64, json_output: bool) -> Result<()> {
@@ -854,6 +903,7 @@ fn documentation_index() -> Result<Value> {
                 "scene patch",
                 "examples",
                 "examples launch",
+                "examples launch-all",
                 "benchmark",
                 "logs"
             ]
@@ -1091,6 +1141,112 @@ pre {{
         adapters = html_escape(&adapters_json),
         graph = html_escape(&graph_json),
         events = html_escape(&events_json),
+    ))
+}
+
+fn examples_index_html(launched: &[Value]) -> Result<String> {
+    let mut cards = String::new();
+    for item in launched {
+        let name = item
+            .get("example")
+            .and_then(Value::as_str)
+            .unwrap_or("unknown");
+        let output_dir = item.get("output_dir").and_then(Value::as_str).unwrap_or("");
+        cards.push_str(&format!(
+            r#"<a class="card" href="{href}">
+  <span class="name">{name}</span>
+  <span class="path">{path}</span>
+</a>
+"#,
+            href = html_escape(&format!("{name}/preview.html")),
+            name = html_escape(name),
+            path = html_escape(output_dir),
+        ));
+    }
+
+    Ok(format!(
+        r#"<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FRAME0 Example Launch Index</title>
+<style>
+:root {{
+  color-scheme: dark;
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: #111315;
+  color: #f0f4f5;
+}}
+body {{
+  margin: 0;
+  background:
+    linear-gradient(135deg, rgba(58, 114, 112, 0.24), transparent 44%),
+    linear-gradient(315deg, rgba(178, 122, 62, 0.2), transparent 42%),
+    #111315;
+}}
+main {{
+  width: min(1160px, calc(100vw - 40px));
+  margin: 0 auto;
+  padding: 34px 0 54px;
+}}
+h1 {{
+  margin: 0 0 8px;
+  font-size: 30px;
+  line-height: 1.1;
+  letter-spacing: 0;
+}}
+p {{
+  margin: 0 0 24px;
+  color: #b9c3c5;
+}}
+.grid {{
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 14px;
+}}
+.card {{
+  display: block;
+  min-height: 92px;
+  padding: 15px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 8px;
+  background: rgba(12, 15, 17, 0.8);
+  color: inherit;
+  text-decoration: none;
+}}
+.card:hover {{
+  border-color: rgba(147, 217, 187, 0.52);
+  background: rgba(21, 29, 28, 0.88);
+}}
+.name {{
+  display: block;
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 11px;
+}}
+.path {{
+  display: block;
+  color: #a7b3b6;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 11px;
+  overflow-wrap: anywhere;
+}}
+</style>
+</head>
+<body>
+<main>
+  <h1>FRAME0 Example Launch Index</h1>
+  <p>{count} deterministic example launches. Open any preview to inspect generated runtime artifacts.</p>
+  <div class="grid">
+{cards}
+  </div>
+</main>
+</body>
+</html>
+"#,
+        count = launched.len(),
+        cards = cards,
     ))
 }
 

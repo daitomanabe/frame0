@@ -167,6 +167,8 @@ List examples with:
 ```bash
 cargo run -p frame0_cli -- examples list --json
 cargo run -p frame0_cli -- examples launch projection_mapping --frames 120 --out runs/examples/projection_mapping --json
+cargo run -p frame0_cli -- examples launch-all --frames 24 --out runs/examples --json
+scripts/launch_examples.sh
 scripts/verify_examples.sh
 ```
 
