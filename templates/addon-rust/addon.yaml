@@ -1,0 +1,27 @@
+addon:
+  id: org.example.frame0.rust_addon
+  name: FRAME0 Rust Addon Template
+  version: 0.1.0
+  api_version: 1
+  kind: rust_crate
+  description: Minimal Rust addon skeleton with unit tests and a CLI-verifiable example.
+  license: MIT
+  capabilities:
+    - visual.node
+    - parameter.processor
+  entrypoints:
+    rust_crate: Cargo.toml
+  permissions:
+    camera: false
+    microphone: false
+    network: false
+    file_read: false
+    file_write: false
+  examples:
+    - examples/basic_scene.yaml
+  tests:
+    - cargo test
+  compatibility:
+    frame0: ">=0.1"
+    platforms: [macos_arm64, macos_x86_64, linux_x86_64, linux_aarch64]
+    features: [rust_addon]

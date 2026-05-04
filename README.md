@@ -160,6 +160,7 @@ native/frame0_cpp_sdk/        C++ adapter interface
 native/adapters/mock_sdk/     Mock native video/audio SDK plugin
 native/adapters/mock_ml/      Mock native ML plugin
 addons/                       Third-party addon registry convention
+templates/addon-rust/         Standalone Rust addon skeleton with tests
 plugins/                      Plugin and extension manifests
 examples/                     CLI-testable scene manifests
 docs/                         ADRs, operation guides, native/ML/extension docs
