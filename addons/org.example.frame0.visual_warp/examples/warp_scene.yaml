@@ -1,0 +1,32 @@
+name: visual_warp_addon_example
+version: "0.1"
+runtime: frame0
+permissions:
+  camera: false
+  microphone: false
+  network: false
+clock:
+  primary: manual
+  fallback: monotonic
+  fixed_step_ns: 16666667
+nodes:
+  source:
+    type: render.shader
+    shader: shaders/source_gradient.msl
+  warp:
+    type: addon.visual_warp
+    addon: org.example.frame0.visual_warp
+    input: source.output
+    params:
+      amount: 0.42
+      frequency: 3.0
+      phase: 0.0
+      mode: radial
+  composite:
+    type: render.shader
+    input: warp.texture
+    shader: shaders/warp_composite.msl
+outputs:
+  preview:
+    type: screen
+    input: composite.output

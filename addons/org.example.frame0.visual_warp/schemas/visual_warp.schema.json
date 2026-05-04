@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://frame0.local/addons/org.example.frame0.visual_warp/schema/visual_warp.v0.json",
+  "title": "Visual Warp Node Parameters",
+  "type": "object",
+  "properties": {
+    "amount": { "type": "number", "minimum": 0, "maximum": 1 },
+    "frequency": { "type": "number", "minimum": 0 },
+    "phase": { "type": "number" },
+    "mode": { "enum": ["radial", "linear", "noise"] }
+  },
+  "required": ["amount", "frequency", "mode"],
+  "additionalProperties": false
+}

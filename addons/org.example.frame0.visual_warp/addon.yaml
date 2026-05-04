@@ -1,0 +1,29 @@
+addon:
+  id: org.example.frame0.visual_warp
+  name: FRAME0 Visual Warp Example Addon
+  version: 0.1.0
+  api_version: 1
+  kind: schema_pack
+  description: Example third-party visual node package with schema and scene manifest.
+  license: MIT
+  capabilities:
+    - visual.node
+    - shader_pass
+    - texture.processor
+  entrypoints:
+    schemas:
+      - schemas/visual_warp.schema.json
+  permissions:
+    camera: false
+    microphone: false
+    network: false
+    file_read: false
+    file_write: false
+  examples:
+    - examples/warp_scene.yaml
+  tests:
+    - cargo run -p frame0_cli -- inspect addons/org.example.frame0.visual_warp/examples/warp_scene.yaml --json
+  compatibility:
+    frame0: ">=0.1"
+    platforms: [macos_arm64, macos_x86_64, linux_x86_64, linux_aarch64]
+    features: [visual_node]

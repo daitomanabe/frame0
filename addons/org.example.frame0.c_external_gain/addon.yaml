@@ -1,0 +1,32 @@
+addon:
+  id: org.example.frame0.c_external_gain
+  name: FRAME0 C External Gain Example
+  version: 0.1.0
+  api_version: 1
+  kind: native_external
+  description: Example package that uses the C external skeleton as a native gain/bias processor.
+  license: MIT
+  capabilities:
+    - external.node
+    - parameter.processor
+  entrypoints:
+    native_library:
+      macos_arm64: target/libframe0_external_gain.dylib
+      macos_x86_64: target/libframe0_external_gain.dylib
+      linux_x86_64: target/libframe0_external_gain.so
+      linux_aarch64: target/libframe0_external_gain.so
+  permissions:
+    camera: false
+    microphone: false
+    network: false
+    file_read: false
+    file_write: false
+  examples:
+    - examples/gain_scene.yaml
+  tests:
+    - clang -fsyntax-only -I native/frame0_external_c_api -I templates/external-c/include templates/external-c/src/frame0_example_external.c
+    - cargo run -p frame0_cli -- inspect addons/org.example.frame0.c_external_gain/examples/gain_scene.yaml --json
+  compatibility:
+    frame0: ">=0.1"
+    platforms: [macos_arm64, macos_x86_64, linux_x86_64, linux_aarch64]
+    features: [native_external]

@@ -1,4 +1,8 @@
 registry:
   version: "0.1"
   root: addons
-  entries: []
+  entries:
+    - id: org.example.frame0.visual_warp
+      path: addons/org.example.frame0.visual_warp/addon.yaml
+    - id: org.example.frame0.c_external_gain
+      path: addons/org.example.frame0.c_external_gain/addon.yaml

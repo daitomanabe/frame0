@@ -30,6 +30,6 @@ Loop rule for this checklist:
 - [x] External C ABI skeleton for native externals.
 - [x] Rust addon skeleton with tests.
 - [x] C/C++ external skeleton with header, build notes, and example entry points.
-- [ ] Example third-party addon/external packages.
+- [x] Example third-party addon/external packages.
 - [ ] Addon authoring guide: packaging, versioning, capabilities, permissions, tests, and examples.
 - [ ] CLI helper commands or documented flows for verifying addon/external packages.
