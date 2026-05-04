@@ -194,6 +194,8 @@ AI agents should not infer device IDs by name, depend on GUI state, write vendor
 - [Native C ABI Reference](docs/native/c-abi-reference.md)
 - [Native ML Adapter](docs/ml/native-ml-adapter.md)
 - [Plugin And Extension Examples](docs/extensions/plugin-extension-examples.md)
+- [Creative Tool Concept Map](docs/creative/CONCEPT_MAP.md)
+- [Creative Parity Checklist](docs/creative/FEATURE_CHECKLIST.md)
 - [Implementation Status](FRAME0_IMPLEMENTATION_STATUS.md)
 - [Architecture Decisions](docs/adr)
 

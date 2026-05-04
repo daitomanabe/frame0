@@ -22,7 +22,7 @@ Loop rule for this checklist:
 - [x] Timeline and sequencing: clips, cues, keyframes, transport, beats, and deterministic replay.
 - [x] Media utilities: image sequence, movie, audio buffer, texture feedback, and capture/playback manifests.
 - [x] Visual node examples: feedback, instancing, particles, shader passes, text, and 2D/3D composition.
-- [ ] Developer-facing docs that map openFrameworks / Processing / Cinder / TouchDesigner concepts to FRAME0.
+- [x] Developer-facing docs that map openFrameworks / Processing / Cinder / TouchDesigner concepts to FRAME0.
 
 ## Third-Party Ecosystem
 
