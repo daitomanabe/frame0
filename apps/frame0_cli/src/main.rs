@@ -115,7 +115,12 @@ enum Command {
         #[arg(long, default_value_t = 1000)]
         frames: u64,
     },
-    Logs,
+    Logs {
+        #[arg(long)]
+        root: Option<PathBuf>,
+        #[arg(long, default_value_t = 20)]
+        tail: usize,
+    },
 }
 
 #[derive(Debug, Subcommand)]
@@ -264,7 +269,7 @@ fn run() -> Result<()> {
         Command::Scene { command } => command_scene(command, cli.json),
         Command::Examples { command } => command_examples(command, cli.json),
         Command::Benchmark { scene, frames } => command_benchmark(&scene, frames, cli.json),
-        Command::Logs => command_logs(cli.json),
+        Command::Logs { root, tail } => command_logs(root.as_deref(), tail, cli.json),
     }
 }
 
@@ -778,12 +783,27 @@ fn command_benchmark(scene_path: &Path, frames: u64, json_output: bool) -> Resul
     print_value(&report, json_output, "benchmark completed")
 }
 
-fn command_logs(json_output: bool) -> Result<()> {
+fn command_logs(root: Option<&Path>, tail: usize, json_output: bool) -> Result<()> {
+    let root = root
+        .map(Path::to_path_buf)
+        .unwrap_or_else(|| repo_root().join("runs").join("examples"));
+    let runs = discover_launch_logs(&root, tail)?;
+    let count = runs.len();
     let report = json!({
-        "logs": [],
-        "note": "structured log persistence is a runtime supervisor task; no persisted logs in scaffold mode"
+        "root": path_for_report(&root),
+        "count": count,
+        "tail": tail,
+        "runs": runs,
     });
-    print_value(&report, json_output, "no persisted logs")
+    print_value(
+        &report,
+        json_output,
+        if count == 0 {
+            format!("no launch logs in {}", root.display())
+        } else {
+            format!("listed {count} launch logs from {}", root.display())
+        },
+    )
 }
 
 fn parse_diagnostic(value: Value) -> Result<Frame0Diagnostic> {
@@ -948,6 +968,75 @@ fn path_for_report(path: &Path) -> String {
         .unwrap_or(path)
         .display()
         .to_string()
+}
+
+fn discover_launch_logs(root: &Path, tail: usize) -> Result<Vec<Value>> {
+    if !root.exists() {
+        return Ok(Vec::new());
+    }
+
+    let mut run_dirs = Vec::new();
+    if root.join("events.ndjson").is_file() {
+        run_dirs.push(root.to_path_buf());
+    } else if root.is_dir() {
+        for entry in
+            fs::read_dir(root).with_context(|| format!("failed to read {}", root.display()))?
+        {
+            let entry = entry?;
+            let path = entry.path();
+            if path.join("events.ndjson").is_file() {
+                run_dirs.push(path);
+            }
+        }
+    }
+    run_dirs.sort();
+
+    let mut runs = Vec::new();
+    for dir in run_dirs {
+        let events_path = dir.join("events.ndjson");
+        let launch_path = dir.join("launch.json");
+        let launch = if launch_path.is_file() {
+            load_json_value(&launch_path)?
+        } else {
+            json!({})
+        };
+        let events_text = fs::read_to_string(&events_path)
+            .with_context(|| format!("failed to read {}", events_path.display()))?;
+        let mut events = Vec::new();
+        for line in events_text.lines().filter(|line| !line.trim().is_empty()) {
+            let event =
+                serde_json::from_str::<Value>(line).unwrap_or_else(|_| json!({ "raw": line }));
+            events.push(event);
+        }
+        let total_events = events.len();
+        let start = if tail == 0 {
+            total_events
+        } else {
+            total_events.saturating_sub(tail)
+        };
+        let tail_events = events[start..].to_vec();
+        let example = launch
+            .get("example")
+            .and_then(Value::as_str)
+            .map(str::to_string)
+            .or_else(|| {
+                dir.file_name()
+                    .and_then(|name| name.to_str())
+                    .map(str::to_string)
+            })
+            .unwrap_or_else(|| "unknown".to_string());
+        runs.push(json!({
+            "example": example,
+            "run_dir": path_for_report(&dir),
+            "launch_json": path_for_report(&launch_path),
+            "events_ndjson": path_for_report(&events_path),
+            "preview_html": path_for_report(&dir.join("preview.html")),
+            "total_events": total_events,
+            "tail_events": tail_events,
+            "launch": launch,
+        }));
+    }
+    Ok(runs)
 }
 
 fn example_adapter_status(scene: &SceneManifest) -> Vec<Value> {

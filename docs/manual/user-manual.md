@@ -70,6 +70,7 @@ cargo run -p frame0_cli -- examples list --json
 cargo run -p frame0_cli -- examples run audio_visual_sync --frames 4
 cargo run -p frame0_cli -- examples launch projection_mapping --frames 120 --out runs/examples/projection_mapping --json
 cargo run -p frame0_cli -- examples launch-all --frames 24 --out runs/examples --json
+cargo run -p frame0_cli -- logs --root runs/examples --tail 5 --json
 scripts/launch_examples.sh
 scripts/verify_examples.sh
 ```
@@ -172,3 +173,9 @@ The launch command writes:
 - `frames.json`
 
 `launch-all` also writes `index.html` at the output root.
+
+Read launch event logs with:
+
+```bash
+cargo run -p frame0_cli -- logs --root runs/examples --tail 5 --json
+```

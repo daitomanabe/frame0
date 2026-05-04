@@ -19,7 +19,7 @@ should be implemented as a small, reviewable change with tests and a push.
 - [ ] Add structured IPC between the runtime and plugin host.
 - [ ] Forward stream packets from plugin host smoke tests into runtime events/resources.
 - [ ] Add runtime resource mutation transport for `frame0 resource set`.
-- [ ] Persist structured logs for `frame0 logs`.
+- [x] Persist structured logs for `frame0 logs`.
 
 ## Rendering
 

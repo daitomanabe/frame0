@@ -38,6 +38,7 @@ This repository now contains a working FRAME0 v0.1 scaffold built from `frame0_a
 - Expanded examples for projection mapping, multi-camera switching, depth point clouds, MIDI/OSC control, generative typography, dataset recording, Core ML style transfer, and spatial audio visualization
 - Example launcher via `frame0 examples launch <name>` writes `preview.html`, `launch.json`, `events.ndjson`, and `frames.json`
 - Batch example launcher via `frame0 examples launch-all` writes every example launch plus `index.html`
+- Structured launch log reader via `frame0 logs --root <launch-dir> --tail <n>`
 - Examples: 31 CLI-verifiable scenes covering shader/rendering, audio, audio-visual sync, ML, Apple native APIs, native SDK bridges, projection mapping, multi-camera switching, depth point clouds, MIDI/OSC control, generative typography, dataset recording, extensions, and addon/external authoring patterns
 - CI workflow for format and tests
 - Unit and integration tests
@@ -74,6 +75,7 @@ cargo run -q -p frame0_cli -- docs examples --json
 cargo run -q -p frame0_cli -- new /tmp/frame0-addon-smoke --kind addon-rust --force
 cargo run -q -p frame0_cli -- examples launch projection_mapping --frames 4 --out /tmp/frame0-example-launch --json
 cargo run -q -p frame0_cli -- examples launch-all --frames 2 --out /tmp/frame0-example-launch-all --json
+cargo run -q -p frame0_cli -- logs --root /tmp/frame0-example-launch-all --tail 2 --json
 cargo run -q -p frame0_cli -- schema export scene --json
 cargo run -q -p frame0_cli -- schema export all --json
 scripts/verify_examples.sh

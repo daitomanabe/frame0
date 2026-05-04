@@ -42,6 +42,7 @@ frame0 examples run audio_visual_sync --frames 4
 frame0 examples launch projection_mapping --frames 120 --out runs/examples/projection_mapping --json
 frame0 examples launch-all --frames 24 --out runs/examples --json
 frame0 benchmark examples/hello_shader/scene.yaml --json
+frame0 logs --root runs/examples --tail 5 --json
 scripts/launch_examples.sh
 scripts/verify_examples.sh
 ```

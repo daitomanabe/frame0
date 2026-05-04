@@ -167,6 +167,42 @@ fn examples_launch_all_writes_index_and_previews() {
 }
 
 #[test]
+fn logs_reads_launch_events() {
+    let temp = tempdir().unwrap();
+    let out_dir = temp.path().join("launch");
+    Command::cargo_bin("frame0")
+        .unwrap()
+        .args([
+            "examples",
+            "launch",
+            "projection_mapping",
+            "--frames",
+            "3",
+            "--out",
+            out_dir.to_str().unwrap(),
+            "--json",
+        ])
+        .assert()
+        .success();
+
+    Command::cargo_bin("frame0")
+        .unwrap()
+        .args([
+            "logs",
+            "--root",
+            out_dir.to_str().unwrap(),
+            "--tail",
+            "2",
+            "--json",
+        ])
+        .assert()
+        .success()
+        .stdout(predicate::str::contains("\"count\": 1"))
+        .stdout(predicate::str::contains("\"tail_events\""))
+        .stdout(predicate::str::contains("frame.rendered"));
+}
+
+#[test]
 fn new_addon_rust_copies_template_without_target() {
     let temp = tempdir().unwrap();
     let addon_dir = temp.path().join("my_addon");
