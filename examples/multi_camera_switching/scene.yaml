@@ -1,0 +1,104 @@
+name: multi_camera_switching
+version: "0.1"
+runtime: frame0
+permissions:
+  camera: true
+  microphone: true
+  network: false
+  file_read: false
+  file_write: true
+clock:
+  primary: manual
+  fallback: monotonic
+  fixed_step_ns: 16666667
+inputs:
+  camera_a:
+    type: video.input
+    selector:
+      capability: video.input
+      vendor: mock
+    mode: 1080p60
+  camera_b:
+    type: video.input
+    selector:
+      capability: video.input
+      vendor: mock
+    mode: 1080p60
+  camera_c:
+    type: video.input
+    selector:
+      capability: video.input
+      vendor: mock
+    mode: 1080p60
+  camera_d:
+    type: video.input
+    selector:
+      capability: video.input
+      vendor: mock
+    mode: 1080p60
+  room_audio:
+    type: audio.input
+    selector:
+      capability: audio.input
+      vendor: mock
+    mode: stereo_48k
+nodes:
+  sync:
+    type: media.frame_sync
+    inputs:
+      a: camera_a.video
+      b: camera_b.video
+      c: camera_c.video
+      d: camera_d.video
+    params:
+      policy: nearest_pts
+      max_offset_ms: 8
+  color_match:
+    type: video.color_match
+    input: sync.frames
+    params:
+      reference: a
+      exposure: auto
+      white_balance: auto
+  motion_score:
+    type: video.motion_analyzer
+    input: color_match.frames
+    params:
+      regions: [center, left, right]
+      smoothing_ms: 240
+  audio_onset:
+    type: audio.onset_detector
+    input: room_audio.samples
+    params:
+      bands: 24
+      threshold: 0.62
+  switcher:
+    type: video.program_switcher
+    inputs:
+      cameras: color_match.frames
+      motion: motion_score.values
+      onset: audio_onset.events
+    params:
+      mode: auto_with_manual_override
+      transition: dissolve
+      duration_ms: 180
+      hold_min_ms: 1200
+  lower_third:
+    type: render.text_overlay
+    input: switcher.program
+    params:
+      text: FRAME0 LIVE
+      anchor: bottom_left
+      margin_px: 48
+      opacity: 0.82
+outputs:
+  program:
+    type: screen
+    input: lower_third.texture
+  recording:
+    type: media.capture_sink
+    input: lower_third.texture
+    params:
+      container: mov
+      codec: prores_422
+      path: captures/multi_camera_switching/program.mov

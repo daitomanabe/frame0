@@ -1,6 +1,6 @@
 use assert_cmd::Command;
 use predicates::prelude::*;
-use std::path::PathBuf;
+use std::{fs, path::PathBuf};
 use tempfile::tempdir;
 
 fn repo_path(path: &str) -> String {
@@ -146,30 +146,23 @@ fn plugin_verify_outputs_ok() {
 }
 
 #[test]
-fn extension_examples_inspect_cleanly() {
-    for example in [
-        "examples/camera_extension_output/scene.yaml",
-        "examples/auv3_audio_unit/scene.yaml",
-        "examples/extension_multi_output/scene.yaml",
-        "examples/creative_primitives/scene.yaml",
-        "examples/cinder_geometry/scene.yaml",
-        "examples/operator_network/scene.yaml",
-        "examples/parameter_automation/scene.yaml",
-        "examples/input_events/scene.yaml",
-        "examples/timeline_sequencing/scene.yaml",
-        "examples/media_utilities/scene.yaml",
-        "examples/visual_nodes/scene.yaml",
-        "examples/cpp_external_bridge/scene.yaml",
-        "examples/shader_post_processing/scene.yaml",
-        "examples/audio_pipeline/scene.yaml",
-        "examples/audio_visual_sync/scene.yaml",
-        "examples/ml_multimodal_pipeline/scene.yaml",
-        "examples/apple_native_features/scene.yaml",
-    ] {
-        let scene = repo_path(example);
+fn all_examples_inspect_cleanly() {
+    let examples_dir = PathBuf::from(repo_path("examples"));
+    let mut scenes = Vec::new();
+    for entry in fs::read_dir(&examples_dir).unwrap() {
+        let entry = entry.unwrap();
+        let scene = entry.path().join("scene.yaml");
+        if scene.is_file() {
+            scenes.push(scene);
+        }
+    }
+    scenes.sort();
+    assert!(scenes.len() >= 31, "expected rich example coverage");
+
+    for scene in scenes {
         Command::cargo_bin("frame0")
             .unwrap()
-            .args(["inspect", scene.as_str(), "--json"])
+            .args(["inspect", scene.to_str().unwrap(), "--json"])
             .assert()
             .success()
             .stdout(predicate::str::contains("\"ok\": true"));

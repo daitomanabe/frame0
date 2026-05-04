@@ -35,7 +35,8 @@ This repository now contains a working FRAME0 v0.1 scaffold built from `frame0_a
 - API compatibility notes for schema, CLI JSON, NDJSON, and native ABI changes
 - Repository example verification helper via `scripts/verify_examples.sh`
 - Addon skeleton generator via `frame0 new <path> --kind addon-rust`
-- Examples: `hello_shader`, `headless_render`, `camera_to_shader`, `audio_reactive`, `mock_sdk_input`, `native_ml`, `creative_primitives`, `cinder_geometry`, `operator_network`, `parameter_automation`, `input_events`, `timeline_sequencing`, `media_utilities`, `visual_nodes`, `cpp_external_bridge`, `shader_post_processing`, `audio_pipeline`, `audio_visual_sync`, `ml_multimodal_pipeline`, `apple_native_features`, `camera_extension_output`, `auv3_audio_unit`, `extension_multi_output`
+- Expanded examples for projection mapping, multi-camera switching, depth point clouds, MIDI/OSC control, generative typography, dataset recording, Core ML style transfer, and spatial audio visualization
+- Examples: 31 CLI-verifiable scenes covering shader/rendering, audio, audio-visual sync, ML, Apple native APIs, native SDK bridges, projection mapping, multi-camera switching, depth point clouds, MIDI/OSC control, generative typography, dataset recording, extensions, and addon/external authoring patterns
 - CI workflow for format and tests
 - Unit and integration tests
 

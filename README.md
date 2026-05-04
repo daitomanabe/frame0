@@ -140,6 +140,14 @@ Included extension examples:
 | `timeline_sequencing` | Clips, cues, keyframes, beat tracks, transport, and deterministic replay |
 | `media_utilities` | Image sequence, movie, audio buffer, feedback, capture, and playback manifests |
 | `visual_nodes` | Feedback, instancing, particles, shader passes, text, and 2D/3D composition |
+| `projection_mapping` | Quad warp, calibration, masking, edge blend, and projector output |
+| `multi_camera_switching` | Four-camera sync, color match, motion scoring, auto switching, and recording |
+| `depth_pointcloud` | Depth camera filtering, point cloud conversion, particles, and point cache |
+| `midi_osc_control_surface` | MIDI, OSC, keyboard mappings, smoothing, presets, and shader control |
+| `generative_typography` | SDF font atlas, text layout, glyph instancing, feedback, and still capture |
+| `dataset_recorder` | Synchronized camera/audio/labels capture for ML datasets |
+| `coreml_style_transfer` | AVFoundation, Metal preprocessing, Core ML inference, temporal stabilization |
+| `spatial_audio_visualizer` | Ambisonic audio analysis, source tracking, instanced geometry, and recording |
 | `cpp_external_bridge` | C++ native external through the stable C ABI |
 | `shader_post_processing` | Multipass shader stack with bloom, LUT color, feedback, and capture |
 | `audio_pipeline` | Audio input, generator, analyzer, mixer, recorder, meter, and output routing |

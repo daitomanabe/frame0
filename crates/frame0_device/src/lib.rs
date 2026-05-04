@@ -231,6 +231,27 @@ pub fn mock_devices() -> Vec<DeviceResource> {
             }],
         },
         DeviceResource {
+            id: "device.depth_input.mock.0".to_string(),
+            device_type: "device.depth_input".to_string(),
+            vendor: "frame0.mock".to_string(),
+            capabilities: vec![
+                "depth.input".to_string(),
+                "video.input".to_string(),
+                "pointcloud.input".to_string(),
+            ],
+            status: "available".to_string(),
+            process: "plugin_host.mock_depth".to_string(),
+            permissions: vec!["camera".to_string()],
+            modes: vec![DeviceMode {
+                id: "1280x720_30".to_string(),
+                width: Some(1280),
+                height: Some(720),
+                fps: Some(30.0),
+                sample_rate: None,
+                channels: None,
+            }],
+        },
+        DeviceResource {
             id: "extension.audio_unit.mock.0".to_string(),
             device_type: "extension.audio_unit".to_string(),
             vendor: "frame0.mock".to_string(),
@@ -311,6 +332,7 @@ mod tests {
             "serial.input",
             "touch.multitouch",
             "screen.capture",
+            "depth.input",
         ] {
             assert!(
                 !devices_with_capability(capability).is_empty(),

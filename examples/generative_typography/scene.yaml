@@ -1,0 +1,78 @@
+name: generative_typography
+version: "0.1"
+runtime: frame0
+permissions:
+  camera: false
+  microphone: false
+  network: false
+  file_read: true
+  file_write: true
+clock:
+  primary: manual
+  fallback: monotonic
+  fixed_step_ns: 16666667
+inputs:
+  text_source:
+    type: text.sequence
+    params:
+      lines:
+        - FRAME0
+        - TIME
+        - SIGNAL
+        - SURFACE
+      mode: loop
+  feedback_history:
+    type: render.feedback_history
+    history: 2
+    pixel_format: rgba16f
+nodes:
+  font_atlas:
+    type: text.sdf_font_atlas
+    input: text_source.lines
+    params:
+      font: assets/fonts/InterVariable.ttf
+      px_range: 8
+      atlas_size: 2048
+  layout:
+    type: text.layout
+    inputs:
+      text: text_source.lines
+      atlas: font_atlas.atlas
+    params:
+      align: center
+      tracking: 0.04
+      line_height: 0.92
+  glyph_instances:
+    type: render.glyph_instances
+    input: layout.glyphs
+    params:
+      motion: noise_field
+      amplitude: 0.08
+      seed: 42
+  trails:
+    type: render.post_process
+    inputs:
+      current: glyph_instances.texture
+      previous: feedback_history.texture
+    shader: shaders/text/feedback_trails.msl
+    params:
+      decay: 0.91
+      chroma_shift: 0.004
+  composite:
+    type: render.post_process
+    input: trails.texture
+    shader: shaders/text/final_type_composite.msl
+    params:
+      background: [0.005, 0.006, 0.008, 1.0]
+      foreground: [0.9, 0.95, 1.0, 1.0]
+outputs:
+  preview:
+    type: screen
+    input: composite.texture
+  stills:
+    type: media.capture_sink
+    input: composite.texture
+    params:
+      container: frames
+      codec: png
+      path: captures/generative_typography/frame_%05d.png

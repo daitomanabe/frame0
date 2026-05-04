@@ -1,0 +1,69 @@
+name: projection_mapping
+version: "0.1"
+runtime: frame0
+permissions:
+  camera: false
+  microphone: false
+  network: false
+  file_read: true
+  file_write: false
+clock:
+  primary: manual
+  fallback: monotonic
+  fixed_step_ns: 16666667
+inputs:
+  projector_calibration:
+    type: media.calibration_file
+    params:
+      path: assets/calibration/stage_projector_a.json
+      format: frame0.projector_calibration.v0
+  mask_image:
+    type: media.image
+    params:
+      path: assets/masks/stage_soft_mask.png
+      color_space: linear
+nodes:
+  source_content:
+    type: render.shader
+    shader: shaders/projection/source_pattern.msl
+    params:
+      resolution: [1920, 1200]
+      grid_mix: 0.12
+      colorway: blue_gold
+  quad_warp:
+    type: render.geometry_warp
+    inputs:
+      texture: source_content.output
+      calibration: projector_calibration.data
+    params:
+      interpolation: bicubic
+      mesh_density: [32, 20]
+      overscan_px: 24
+  edge_blend:
+    type: render.edge_blend
+    input: quad_warp.texture
+    params:
+      left: 0.08
+      right: 0.08
+      gamma: 2.2
+      curve: smoothstep
+  masked_composite:
+    type: render.post_process
+    inputs:
+      warped: edge_blend.texture
+      mask: mask_image.texture
+    shader: shaders/projection/masked_composite.msl
+    params:
+      mask_channel: alpha
+      black_level: 0.002
+outputs:
+  preview:
+    type: screen
+    input: masked_composite.texture
+  projector:
+    type: projection.output
+    input: masked_composite.texture
+    params:
+      display: projector_a
+      mode: exclusive_fullscreen
+      color_space: display_p3

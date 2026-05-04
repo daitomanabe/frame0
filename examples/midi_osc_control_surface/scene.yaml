@@ -1,0 +1,71 @@
+name: midi_osc_control_surface
+version: "0.1"
+runtime: frame0
+permissions:
+  camera: false
+  microphone: false
+  network: true
+  file_read: true
+  file_write: false
+clock:
+  primary: manual
+  fallback: monotonic
+  fixed_step_ns: 16666667
+inputs:
+  midi:
+    type: input.midi
+    selector:
+      capability: midi.input
+      vendor: mock
+    params:
+      mapping: assets/midi/xone_k2.yaml
+  osc:
+    type: input.osc
+    selector:
+      capability: osc.input
+      vendor: mock
+    params:
+      listen: 127.0.0.1:9000
+      namespace: /frame0
+  keyboard:
+    type: input.keyboard
+    params:
+      focus: preview_window
+nodes:
+  mapper:
+    type: control.mapping
+    inputs:
+      midi: midi.events
+      osc: osc.events
+      keyboard: keyboard.events
+    params:
+      routes:
+        brightness: [midi.fader_1, osc./brightness]
+        hue: [midi.encoder_2, osc./hue]
+        freeze: [midi.button_1, keyboard.space]
+        preset_next: [midi.button_8, keyboard.right]
+  smoothing:
+    type: control.smoother
+    input: mapper.parameters
+    params:
+      default_ms: 80
+      freeze_latch: true
+  preset_bank:
+    type: control.presets
+    input: smoothing.parameters
+    params:
+      path: assets/presets/control_surface.yaml
+      morph_ms: 600
+  shader:
+    type: render.shader
+    input: preset_bank.parameters
+    shader: shaders/control_surface/reactive_gradient.msl
+    params:
+      resolution: [1920, 1080]
+outputs:
+  preview:
+    type: screen
+    input: shader.output
+  control_events:
+    type: event.ndjson
+    input: preset_bank.events

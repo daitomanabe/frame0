@@ -1,0 +1,67 @@
+name: coreml_style_transfer
+version: "0.1"
+runtime: frame0
+permissions:
+  camera: true
+  microphone: false
+  network: false
+  file_read: true
+  file_write: false
+clock:
+  primary: manual
+  fallback: monotonic
+  fixed_step_ns: 16666667
+inputs:
+  camera:
+    type: apple.avfoundation.camera
+    selector:
+      capability: video.input
+      vendor: apple.avfoundation
+    mode: 1080p60
+  style_model:
+    type: ml.model
+    params:
+      id: style_transfer_mock
+      runtime: coreml
+      path: models/style_transfer_mock.mlpackage
+      input_shape: [1, 3, 512, 512]
+nodes:
+  preprocess:
+    type: apple.metal.compute
+    input: camera.video
+    shader: shaders/ml/preprocess_camera_to_tensor.msl
+    params:
+      output_shape: [1, 3, 512, 512]
+      color_space: linear_srgb
+  inference:
+    type: apple.coreml.inference
+    inputs:
+      tensor: preprocess.tensor
+      model: style_model.model
+    params:
+      compute_units: all
+      precision: fp16
+  temporal_stabilizer:
+    type: ml.temporal_stabilizer
+    input: inference.tensor
+    params:
+      blend: 0.78
+      motion_compensation: optical_flow
+  composite:
+    type: render.post_process
+    inputs:
+      camera: camera.video
+      stylized: temporal_stabilizer.tensor
+    shader: shaders/ml/style_transfer_composite.msl
+    params:
+      mix: 0.85
+      sharpen: 0.12
+outputs:
+  preview:
+    type: screen
+    input: composite.texture
+  virtual_camera:
+    type: extension.output
+    input: composite.texture
+    params:
+      target: core_media_io_camera_extension

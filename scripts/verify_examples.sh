@@ -14,7 +14,12 @@ count=0
 while IFS= read -r scene; do
   [ -n "$scene" ] || continue
   echo "inspect $scene"
-  cargo run -q -p frame0_cli -- inspect "$scene" --json >/dev/null
+  output="$(cargo run -q -p frame0_cli -- inspect "$scene" --json)"
+  if ! printf '%s\n' "$output" | rg -q '"ok": true'; then
+    echo "example inspect reported diagnostics: $scene" >&2
+    printf '%s\n' "$output" >&2
+    exit 1
+  fi
   count=$((count + 1))
 done < <(find examples -mindepth 2 -maxdepth 2 -name scene.yaml | sort)
 

@@ -1,0 +1,77 @@
+name: depth_pointcloud
+version: "0.1"
+runtime: frame0
+permissions:
+  camera: true
+  microphone: false
+  network: false
+  file_read: false
+  file_write: true
+clock:
+  primary: manual
+  fallback: monotonic
+  fixed_step_ns: 16666667
+inputs:
+  depth_camera:
+    type: depth.input
+    selector:
+      capability: depth.input
+      vendor: mock.depth
+    mode: 1280x720_30
+    params:
+      streams: [depth, confidence, color]
+      depth_units: millimeters
+nodes:
+  depth_filter:
+    type: depth.temporal_filter
+    inputs:
+      depth: depth_camera.depth
+      confidence: depth_camera.confidence
+    params:
+      min_depth_m: 0.35
+      max_depth_m: 5.5
+      confidence_threshold: 0.6
+      history: 3
+  pointcloud:
+    type: geometry.pointcloud_from_depth
+    inputs:
+      depth: depth_filter.depth
+      color: depth_camera.color
+    params:
+      intrinsics: depth_camera
+      stride: 2
+      coordinate_system: right_handed_y_up
+  particle_surface:
+    type: render.particles
+    input: pointcloud.points
+    params:
+      point_size_px: 2.5
+      velocity_source: optical_flow
+      color_source: camera
+      max_points: 250000
+  orbit_camera:
+    type: render.camera_3d
+    input: particle_surface.bounds
+    params:
+      mode: orbit
+      distance: 3.2
+      yaw_deg: 18
+      pitch_deg: -12
+  composite:
+    type: render.scene_3d
+    inputs:
+      particles: particle_surface.drawable
+      camera: orbit_camera.camera
+    params:
+      background: [0.01, 0.012, 0.016, 1.0]
+      lighting: soft_grid
+outputs:
+  preview:
+    type: screen
+    input: composite.texture
+  point_cache:
+    type: media.capture_sink
+    input: pointcloud.points
+    params:
+      container: ply_sequence
+      path: captures/depth_pointcloud/frame_%05d.ply

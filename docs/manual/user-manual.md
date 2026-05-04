@@ -77,10 +77,12 @@ Important example groups:
 | --- | --- |
 | Rendering | `hello_shader`, `headless_render`, `shader_post_processing`, `visual_nodes` |
 | Audio | `audio_reactive`, `audio_pipeline`, `audio_visual_sync` |
-| Native SDKs | `mock_sdk_input`, `cpp_external_bridge`, `native_ml` |
-| ML | `native_ml`, `ml_multimodal_pipeline`, `apple_native_features` |
+| Spatial audio | `spatial_audio_visualizer` |
+| Native SDKs | `mock_sdk_input`, `cpp_external_bridge`, `native_ml`, `depth_pointcloud` |
+| ML | `native_ml`, `ml_multimodal_pipeline`, `dataset_recorder`, `coreml_style_transfer`, `apple_native_features` |
 | Apple native | `apple_native_features`, `camera_extension_output`, `auv3_audio_unit` |
-| Creative systems | `creative_primitives`, `cinder_geometry`, `operator_network`, `timeline_sequencing` |
+| Control | `input_events`, `midi_osc_control_surface`, `parameter_automation` |
+| Creative systems | `creative_primitives`, `cinder_geometry`, `operator_network`, `timeline_sequencing`, `projection_mapping`, `generative_typography` |
 
 ## 8. Work With Native Plugins
 

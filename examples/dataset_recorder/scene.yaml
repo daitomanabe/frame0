@@ -1,0 +1,72 @@
+name: dataset_recorder
+version: "0.1"
+runtime: frame0
+permissions:
+  camera: true
+  microphone: true
+  network: false
+  file_read: false
+  file_write: true
+clock:
+  primary: manual
+  fallback: monotonic
+  fixed_step_ns: 16666667
+inputs:
+  camera:
+    type: video.input
+    selector:
+      capability: video.input
+      vendor: mock
+    mode: 1080p60
+  microphone:
+    type: audio.input
+    selector:
+      capability: audio.input
+      vendor: mock
+    mode: stereo_48k
+  labels:
+    type: input.annotation
+    params:
+      source: keyboard
+      labels: [idle, gesture, occluded, calibration]
+nodes:
+  clock_sync:
+    type: media.sync
+    inputs:
+      video: camera.video
+      audio: microphone.samples
+      labels: labels.events
+    params:
+      timestamp_source: frame0_clock
+      tolerance_ms: 2
+  preview_overlay:
+    type: render.annotation_overlay
+    inputs:
+      video: camera.video
+      labels: labels.events
+    params:
+      show_timecode: true
+      show_label: true
+  dataset_writer:
+    type: ml.dataset_writer
+    inputs:
+      synchronized: clock_sync.bundle
+      preview: preview_overlay.texture
+    params:
+      format: frame0_dataset_v0
+      path: captures/datasets/session_001
+      write_manifest: true
+      split: train
+outputs:
+  preview:
+    type: screen
+    input: preview_overlay.texture
+  dataset:
+    type: media.capture_sink
+    input: dataset_writer.records
+    params:
+      container: directory
+      path: captures/datasets/session_001
+  events:
+    type: event.ndjson
+    input: dataset_writer.events
