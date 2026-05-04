@@ -120,6 +120,14 @@ tests:
 
 Native packages can use syntax-only compile checks before full dynamic library loading exists.
 
+For the built-in repository helper, run:
+
+```bash
+scripts/verify_addon_package.sh addons/org.example.my_addon/addon.yaml
+```
+
+The helper inspects example scenes and does not execute arbitrary manifest test commands.
+
 ## Publishing Checklist
 
 1. Add or update `addon.yaml`.

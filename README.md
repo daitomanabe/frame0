@@ -204,6 +204,7 @@ AI agents should not infer device IDs by name, depend on GUI state, write vendor
 - [Creative Parity Checklist](docs/creative/FEATURE_CHECKLIST.md)
 - [Addon Registry Convention](docs/addons/registry.md)
 - [Addon Authoring Guide](docs/addons/authoring-guide.md)
+- [Addon Verification Flow](docs/addons/verification.md)
 - [Implementation Status](FRAME0_IMPLEMENTATION_STATUS.md)
 - [Architecture Decisions](docs/adr)
 

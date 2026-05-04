@@ -32,4 +32,4 @@ Loop rule for this checklist:
 - [x] C/C++ external skeleton with header, build notes, and example entry points.
 - [x] Example third-party addon/external packages.
 - [x] Addon authoring guide: packaging, versioning, capabilities, permissions, tests, and examples.
-- [ ] CLI helper commands or documented flows for verifying addon/external packages.
+- [x] CLI helper commands or documented flows for verifying addon/external packages.
