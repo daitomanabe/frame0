@@ -13,7 +13,7 @@ Loop rule for this checklist:
 
 ## Creative Runtime Foundation
 
-- [ ] Creative primitives crate: vectors, colors, easing, noise, rects, polylines, meshes, and transforms.
+- [x] Creative primitives crate: vectors, colors, easing, noise, rects, polylines, meshes, and transforms.
 - [ ] Processing/openFrameworks-style scene examples for draw primitives, color, transforms, and animation.
 - [ ] Cinder-style geometry and camera/material manifest examples.
 - [ ] TouchDesigner-style operator network schema, parameters, channels, and table/texture conventions.
@@ -33,4 +33,3 @@ Loop rule for this checklist:
 - [ ] Example third-party addon/external packages.
 - [ ] Addon authoring guide: packaging, versioning, capabilities, permissions, tests, and examples.
 - [ ] CLI helper commands or documented flows for verifying addon/external packages.
-

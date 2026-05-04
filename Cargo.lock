@@ -258,6 +258,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "frame0_creative"
+version = "0.1.0"
+dependencies = [
+ "serde",
+]
+
+[[package]]
 name = "frame0_device"
 version = "0.1.0"
 dependencies = [

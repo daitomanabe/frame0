@@ -4,6 +4,7 @@ members = [
   "apps/frame0_plugin_host",
   "crates/frame0_ai_tools",
   "crates/frame0_core",
+  "crates/frame0_creative",
   "crates/frame0_device",
   "crates/frame0_graph",
   "crates/frame0_plugin_api",
