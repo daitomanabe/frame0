@@ -103,6 +103,7 @@ fn extension_examples_inspect_cleanly() {
         "examples/shader_post_processing/scene.yaml",
         "examples/audio_pipeline/scene.yaml",
         "examples/audio_visual_sync/scene.yaml",
+        "examples/ml_multimodal_pipeline/scene.yaml",
     ] {
         let scene = repo_path(example);
         Command::cargo_bin("frame0")

@@ -134,6 +134,7 @@ Included extension examples:
 | `shader_post_processing` | Multipass shader stack with bloom, LUT color, feedback, and capture |
 | `audio_pipeline` | Audio input, generator, analyzer, mixer, recorder, meter, and output routing |
 | `audio_visual_sync` | Beat, onset, FFT, and envelope mapping into visual parameters and replay |
+| `ml_multimodal_pipeline` | Model registry, video/audio preprocessing, native mock inference, postprocess, and overlay |
 | `camera_extension_output` | Core Media I/O Camera Extension output contract |
 | `auv3_audio_unit` | Audio Unit v3 parameter-control contract |
 | `extension_multi_output` | Screen + virtual camera + Syphon-style fan-out |
