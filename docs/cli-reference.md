@@ -27,6 +27,8 @@ frame0 plugins verify plugins/syphon_stub/plugin.yaml --json
 frame0 resources list --scene examples/hello_shader/scene.yaml --json
 frame0 resource get node.color_shader --scene examples/hello_shader/scene.yaml --json
 frame0 doctor --json
+frame0 docs index --json
+frame0 docs examples --json
 frame0 schema list --json
 frame0 schema export scene --json
 frame0 schema export all --json

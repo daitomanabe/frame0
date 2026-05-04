@@ -75,6 +75,35 @@ fn devices_list_outputs_mock_device() {
 }
 
 #[test]
+fn docs_index_outputs_public_contracts() {
+    Command::cargo_bin("frame0")
+        .unwrap()
+        .args(["docs", "index", "--json"])
+        .assert()
+        .success()
+        .stdout(predicate::str::contains("\"api_reference\""))
+        .stdout(predicate::str::contains("docs/api/reference.md"))
+        .stdout(predicate::str::contains("native_boundaries"))
+        .stdout(predicate::str::contains("examples/hello_shader/scene.yaml"));
+}
+
+#[test]
+fn docs_examples_include_scene_and_readme_paths() {
+    Command::cargo_bin("frame0")
+        .unwrap()
+        .args(["docs", "examples", "--json"])
+        .assert()
+        .success()
+        .stdout(predicate::str::contains("\"scene\""))
+        .stdout(predicate::str::contains(
+            "examples/audio_visual_sync/scene.yaml",
+        ))
+        .stdout(predicate::str::contains(
+            "examples/audio_visual_sync/README.md",
+        ));
+}
+
+#[test]
 fn plugin_verify_outputs_ok() {
     let plugin = repo_path("plugins/mock/plugin.yaml");
     Command::cargo_bin("frame0")

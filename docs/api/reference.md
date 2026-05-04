@@ -18,6 +18,8 @@ frame0 run examples/hello_shader/scene.yaml --dry-run --json
 frame0 run examples/hello_shader/scene.yaml --events ndjson --frames 3
 frame0 render examples/headless_render/scene.yaml --frames 60 --json
 frame0 snapshot runtime --scene examples/audio_reactive/scene.yaml --json
+frame0 docs index --json
+frame0 docs examples --json
 frame0 schema list --json
 frame0 schema export all --json
 frame0 examples list --json

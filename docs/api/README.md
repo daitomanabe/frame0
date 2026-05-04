@@ -28,6 +28,13 @@ agents, and third-party addons should depend on.
    creative runtime.
 4. Use the native docs under `docs/native/` when implementing C/C++ adapters.
 
+The same map is available from the CLI:
+
+```bash
+frame0 docs index --json
+frame0 docs examples --json
+```
+
 ## Compatibility Rule
 
 The stable boundary is JSON, NDJSON, YAML manifests, JSON Schema, and C ABI

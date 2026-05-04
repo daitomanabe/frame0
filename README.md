@@ -63,6 +63,8 @@ cargo run -p frame0_cli -- snapshot runtime --scene examples/audio_reactive/scen
 Start from the docs map when building against FRAME0:
 
 ```bash
+cargo run -p frame0_cli -- docs index --json
+cargo run -p frame0_cli -- docs examples --json
 cargo run -p frame0_cli -- schema export all --json
 cargo run -p frame0_cli -- examples list --json
 ```

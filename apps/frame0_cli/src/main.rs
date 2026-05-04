@@ -81,6 +81,10 @@ enum Command {
         command: ResourceCommand,
     },
     Doctor,
+    Docs {
+        #[command(subcommand)]
+        command: DocsCommand,
+    },
     Schema {
         #[command(subcommand)]
         command: SchemaCommand,
@@ -141,6 +145,12 @@ enum ResourcesCommand {
         #[arg(long)]
         scene: Option<PathBuf>,
     },
+}
+
+#[derive(Debug, Subcommand)]
+enum DocsCommand {
+    Index,
+    Examples,
 }
 
 #[derive(Debug, Subcommand)]
@@ -232,6 +242,7 @@ fn run() -> Result<()> {
         Command::Resources { command } => command_resources(command, cli.json),
         Command::Resource { command } => command_resource(command, cli.json),
         Command::Doctor => command_doctor(cli.json),
+        Command::Docs { command } => command_docs(command, cli.json),
         Command::Schema { command } => command_schema(command, cli.json),
         Command::Snapshot { command } => command_snapshot(command, cli.json),
         Command::Explain { command } => command_explain(command, cli.json),
@@ -471,6 +482,35 @@ fn command_doctor(json_output: bool) -> Result<()> {
     print_value(&checks, json_output, "doctor ok")
 }
 
+fn command_docs(command: DocsCommand, json_output: bool) -> Result<()> {
+    match command {
+        DocsCommand::Index => {
+            let index = documentation_index()?;
+            let schema_count = index
+                .get("schemas")
+                .and_then(Value::as_array)
+                .map_or(0, Vec::len);
+            let example_count = index
+                .get("examples")
+                .and_then(Value::as_array)
+                .map_or(0, Vec::len);
+            print_value(
+                &index,
+                json_output,
+                format!("docs index: {schema_count} schemas, {example_count} examples"),
+            )
+        }
+        DocsCommand::Examples => {
+            let examples = example_docs()?;
+            print_value(
+                &examples,
+                json_output,
+                format!("{} documented examples", examples.len()),
+            )
+        }
+    }
+}
+
 fn command_schema(command: SchemaCommand, json_output: bool) -> Result<()> {
     match command {
         SchemaCommand::Export { name } => {
@@ -556,7 +596,7 @@ fn command_examples(command: ExamplesCommand, json_output: bool) -> Result<()> {
             )
         }
         ExamplesCommand::Run { name, frames } => {
-            let path = PathBuf::from("examples").join(&name).join("scene.yaml");
+            let path = repo_root().join("examples").join(&name).join("scene.yaml");
             if !path.is_file() {
                 return Err(anyhow!("example '{name}' not found"));
             }
@@ -616,11 +656,15 @@ fn is_error(diagnostic: &Frame0Diagnostic) -> bool {
 }
 
 fn default_scene_path() -> PathBuf {
-    PathBuf::from("examples/hello_shader/scene.yaml")
+    repo_root().join("examples/hello_shader/scene.yaml")
+}
+
+fn repo_root() -> PathBuf {
+    PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../..")
 }
 
 fn list_examples() -> Result<Vec<String>> {
-    let root = PathBuf::from("examples");
+    let root = repo_root().join("examples");
     let mut names = Vec::new();
     for entry in fs::read_dir(root)? {
         let entry = entry?;
@@ -632,6 +676,78 @@ fn list_examples() -> Result<Vec<String>> {
     }
     names.sort();
     Ok(names)
+}
+
+fn documentation_index() -> Result<Value> {
+    Ok(json!({
+        "frame0_version": env!("CARGO_PKG_VERSION"),
+        "documentation": {
+            "api": "docs/api/README.md",
+            "api_reference": "docs/api/reference.md",
+            "schema_reference": "docs/api/schemas.md",
+            "user_manual": "docs/manual/user-manual.md",
+            "cli_reference": "docs/cli-reference.md",
+            "ai_operation_guide": "docs/ai/operation-guide.md",
+            "development_todo": "docs/roadmap/DEVELOPMENT_TODO.md"
+        },
+        "cli": {
+            "json_global_flag": "--json",
+            "event_stream": "frame0 run <scene> --events ndjson",
+            "commands": [
+                "doctor",
+                "docs index",
+                "docs examples",
+                "inspect",
+                "graph",
+                "run",
+                "render",
+                "devices",
+                "plugins",
+                "resources",
+                "resource",
+                "schema",
+                "snapshot",
+                "explain",
+                "suggest",
+                "scene patch",
+                "examples",
+                "benchmark",
+                "logs"
+            ]
+        },
+        "schemas": schema_names(),
+        "examples": example_docs()?,
+        "native_boundaries": {
+            "plugin_c_abi": "native/frame0_plugin_c_api/frame0_plugin_api.h",
+            "external_c_abi": "native/frame0_external_c_api/frame0_external_api.h",
+            "cpp_adapter": "native/frame0_cpp_sdk/include/frame0/adapter.hpp",
+            "mock_sdk_adapter": "native/adapters/mock_sdk",
+            "mock_ml_adapter": "native/adapters/mock_ml"
+        },
+        "addon_authoring": {
+            "registry": "docs/addons/registry.md",
+            "guide": "docs/addons/authoring-guide.md",
+            "verification": "docs/addons/verification.md",
+            "rust_template": "templates/addon-rust",
+            "external_c_template": "templates/external-c",
+            "external_cpp_template": "templates/external-cpp"
+        }
+    }))
+}
+
+fn example_docs() -> Result<Vec<Value>> {
+    let examples = list_examples()?
+        .into_iter()
+        .map(|name| {
+            let readme = repo_root().join("examples").join(&name).join("README.md");
+            json!({
+                "name": name,
+                "scene": format!("examples/{name}/scene.yaml"),
+                "readme": readme.is_file().then(|| format!("examples/{name}/README.md"))
+            })
+        })
+        .collect();
+    Ok(examples)
 }
 
 fn default_scene_template() -> &'static str {
