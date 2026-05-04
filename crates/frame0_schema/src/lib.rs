@@ -383,6 +383,7 @@ pub fn schema_names() -> &'static [&'static str] {
         "graph",
         "inference_packet",
         "ml_model",
+        "operator_network",
         "parameter",
         "permission",
         "plugin",
@@ -412,6 +413,9 @@ pub fn schema_json(name: &str) -> Result<&'static str, SchemaError> {
             "../../../schemas/inference_packet.schema.json"
         )),
         "ml_model" | "ml-model" => Ok(include_str!("../../../schemas/ml_model.schema.json")),
+        "operator_network" | "operator-network" => Ok(include_str!(
+            "../../../schemas/operator_network.schema.json"
+        )),
         "parameter" => Ok(include_str!("../../../schemas/parameter.schema.json")),
         "permission" => Ok(include_str!("../../../schemas/permission.schema.json")),
         "plugin" => Ok(include_str!("../../../schemas/plugin.schema.json")),

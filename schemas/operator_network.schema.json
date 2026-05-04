@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://frame0.local/schema/operator_network.v0.json",
+  "title": "FRAME0 Operator Network v0",
+  "type": "object",
+  "required": ["operators", "connections"],
+  "properties": {
+    "operators": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/operator" }
+    },
+    "connections": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/connection" }
+    },
+    "exports": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  },
+  "$defs": {
+    "operator": {
+      "type": "object",
+      "required": ["id", "family", "type"],
+      "properties": {
+        "id": { "type": "string" },
+        "family": { "enum": ["TOP", "CHOP", "SOP", "DAT", "MAT", "COMP"] },
+        "type": { "type": "string" },
+        "parameters": { "type": "object" },
+        "outputs": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/port" }
+        }
+      },
+      "additionalProperties": true
+    },
+    "port": {
+      "type": "object",
+      "required": ["name", "resource_type"],
+      "properties": {
+        "name": { "type": "string" },
+        "resource_type": {
+          "enum": ["texture", "channel", "geometry", "table", "material", "component"]
+        }
+      },
+      "additionalProperties": false
+    },
+    "connection": {
+      "type": "object",
+      "required": ["from", "to"],
+      "properties": {
+        "from": { "type": "string" },
+        "to": { "type": "string" }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}
+

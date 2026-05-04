@@ -1,0 +1,67 @@
+name: operator_network
+version: "0.1"
+runtime: frame0
+permissions:
+  camera: false
+  microphone: false
+  network: false
+clock:
+  primary: manual
+  fallback: monotonic
+  fixed_step_ns: 16666667
+nodes:
+  td_network:
+    type: operator.network
+    operators:
+      - id: noise_top
+        family: TOP
+        type: texture.noise
+        parameters:
+          resolution: [1280, 720]
+          seed: 11
+          scale: 3.0
+        outputs:
+          - name: texture
+            resource_type: texture
+      - id: lfo_chop
+        family: CHOP
+        type: channel.lfo
+        parameters:
+          rate_hz: 0.25
+          shape: sine
+        outputs:
+          - name: channels
+            resource_type: channel
+      - id: table_dat
+        family: DAT
+        type: table.inline
+        parameters:
+          columns: [name, value]
+          rows:
+            - [gain, 0.8]
+            - [feedback, 0.15]
+        outputs:
+          - name: table
+            resource_type: table
+      - id: composite_top
+        family: TOP
+        type: texture.composite
+        parameters:
+          blend: screen
+        outputs:
+          - name: texture
+            resource_type: texture
+    connections:
+      - from: noise_top.texture
+        to: composite_top.input0
+      - from: lfo_chop.channels
+        to: composite_top.opacity
+      - from: table_dat.table
+        to: composite_top.parameters
+    exports:
+      - composite_top.texture
+outputs:
+  preview:
+    type: screen
+    input: td_network.composite_top.texture
+
