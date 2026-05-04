@@ -1,0 +1,26 @@
+name: cpp_external_template_scene
+version: "0.1"
+runtime: frame0
+permissions:
+  camera: false
+  microphone: false
+  network: false
+clock:
+  primary: manual
+  fallback: monotonic
+  fixed_step_ns: 16666667
+nodes:
+  cpp_gain:
+    type: external.cpp.gain_bias
+    external: org.example.frame0.cpp_external
+    params:
+      gain: 1.0
+      bias: 0.0
+  shader:
+    type: render.shader
+    input: cpp_gain.output
+    shader: shaders/cpp_external_gain.msl
+outputs:
+  preview:
+    type: screen
+    input: shader.output

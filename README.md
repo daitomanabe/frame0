@@ -130,6 +130,7 @@ Included extension examples:
 | `timeline_sequencing` | Clips, cues, keyframes, beat tracks, transport, and deterministic replay |
 | `media_utilities` | Image sequence, movie, audio buffer, feedback, capture, and playback manifests |
 | `visual_nodes` | Feedback, instancing, particles, shader passes, text, and 2D/3D composition |
+| `cpp_external_bridge` | C++ native external through the stable C ABI |
 | `camera_extension_output` | Core Media I/O Camera Extension output contract |
 | `auv3_audio_unit` | Audio Unit v3 parameter-control contract |
 | `extension_multi_output` | Screen + virtual camera + Syphon-style fan-out |
@@ -163,6 +164,7 @@ addons/                       Third-party addon registry convention
 addons/org.example.*          Example third-party addon/external packages
 templates/addon-rust/         Standalone Rust addon skeleton with tests
 templates/external-c/         C/C++ native external skeleton with ABI entry points
+templates/external-cpp/       C++ external adapter template behind the C ABI
 plugins/                      Plugin and extension manifests
 examples/                     CLI-testable scene manifests
 docs/                         ADRs, operation guides, native/ML/extension docs
@@ -198,6 +200,7 @@ AI agents should not infer device IDs by name, depend on GUI state, write vendor
 - [AI Operation Guide](docs/ai/operation-guide.md)
 - [Native C ABI Reference](docs/native/c-abi-reference.md)
 - [Native External C ABI](docs/native/external-c-abi.md)
+- [C++ Integration Mechanism](docs/native/cpp-integration.md)
 - [Native ML Adapter](docs/ml/native-ml-adapter.md)
 - [Plugin And Extension Examples](docs/extensions/plugin-extension-examples.md)
 - [Creative Tool Concept Map](docs/creative/CONCEPT_MAP.md)
