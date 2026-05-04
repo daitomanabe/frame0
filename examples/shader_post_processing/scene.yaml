@@ -1,0 +1,96 @@
+name: shader_post_processing
+version: "0.1"
+runtime: frame0
+permissions:
+  camera: false
+  microphone: false
+  network: false
+  file_write: true
+clock:
+  primary: manual
+  fallback: monotonic
+  fixed_step_ns: 16666667
+inputs:
+  feedback_history:
+    type: render.feedback_history
+    history: 1
+    pixel_format: rgba16f
+nodes:
+  source:
+    type: render.shader
+    shader: shaders/source_gradient.msl
+    params:
+      resolution: [1920, 1080]
+      color_a: [0.02, 0.05, 0.12, 1.0]
+      color_b: [0.9, 0.15, 0.45, 1.0]
+  luminance_extract:
+    type: render.post_process
+    input: source.output
+    shader: shaders/post/luminance_extract.msl
+    pass: luminance_extract
+    params:
+      threshold: 0.74
+      knee: 0.18
+  blur_horizontal:
+    type: render.post_process
+    input: luminance_extract.texture
+    shader: shaders/post/gaussian_blur_h.msl
+    pass: blur_horizontal
+    params:
+      radius_px: 8
+      sigma: 3.5
+  blur_vertical:
+    type: render.post_process
+    input: blur_horizontal.texture
+    shader: shaders/post/gaussian_blur_v.msl
+    pass: blur_vertical
+    params:
+      radius_px: 8
+      sigma: 3.5
+  color_grade:
+    type: render.post_process
+    inputs:
+      source: source.output
+      bloom: blur_vertical.texture
+    shader: shaders/post/lut_grade.msl
+    pass: color_grade
+    params:
+      lut: assets/luts/film_warm.cube
+      exposure: 0.15
+      contrast: 1.08
+      saturation: 1.12
+  feedback:
+    type: render.post_process
+    inputs:
+      current: color_grade.texture
+      previous: feedback_history.texture
+    shader: shaders/post/feedback_trails.msl
+    pass: feedback
+    params:
+      decay: 0.88
+      blend: screen
+      transform:
+        translate: [0.0015, -0.001]
+        scale: [1.002, 1.002]
+  final_composite:
+    type: render.post_process
+    inputs:
+      graded: color_grade.texture
+      trails: feedback.texture
+    shader: shaders/post/final_composite.msl
+    pass: final_composite
+    params:
+      bloom_mix: 0.42
+      trail_mix: 0.3
+      dither: blue_noise
+outputs:
+  preview:
+    type: screen
+    input: final_composite.texture
+  capture:
+    type: media.capture_sink
+    input: final_composite.texture
+    params:
+      container: frames
+      codec: png16
+      path: captures/shader_post_processing/frame_%05d.png

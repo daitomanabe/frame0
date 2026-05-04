@@ -100,6 +100,7 @@ fn extension_examples_inspect_cleanly() {
         "examples/media_utilities/scene.yaml",
         "examples/visual_nodes/scene.yaml",
         "examples/cpp_external_bridge/scene.yaml",
+        "examples/shader_post_processing/scene.yaml",
     ] {
         let scene = repo_path(example);
         Command::cargo_bin("frame0")
