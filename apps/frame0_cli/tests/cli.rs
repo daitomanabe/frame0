@@ -82,7 +82,9 @@ fn docs_index_outputs_public_contracts() {
         .assert()
         .success()
         .stdout(predicate::str::contains("\"api_reference\""))
+        .stdout(predicate::str::contains("\"compatibility\""))
         .stdout(predicate::str::contains("docs/api/reference.md"))
+        .stdout(predicate::str::contains("docs/api/compatibility.md"))
         .stdout(predicate::str::contains("native_boundaries"))
         .stdout(predicate::str::contains("examples/hello_shader/scene.yaml"));
 }

@@ -2,7 +2,8 @@
 
 FRAME0 is API-first through command-line contracts, schema exports, and native
 C ABI boundaries. This document describes the v0.1 public surface as implemented
-in the repository.
+in the repository. Read [Compatibility](compatibility.md) before changing public
+schemas, CLI JSON, NDJSON events, or native ABI headers.
 
 ## CLI Contract
 

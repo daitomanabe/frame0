@@ -32,6 +32,7 @@ This repository now contains a working FRAME0 v0.1 scaffold built from `frame0_a
 - AI operation guide, error explanation, fix suggestions, graph diff, and merge-patch helper
 - Public API documentation, schema reference, user manual, and development TODO checklist
 - Machine-readable documentation index via `frame0 docs index --json` and example documentation listing via `frame0 docs examples --json`
+- API compatibility notes for schema, CLI JSON, NDJSON, and native ABI changes
 - Repository example verification helper via `scripts/verify_examples.sh`
 - Examples: `hello_shader`, `headless_render`, `camera_to_shader`, `audio_reactive`, `mock_sdk_input`, `native_ml`, `creative_primitives`, `cinder_geometry`, `operator_network`, `parameter_automation`, `input_events`, `timeline_sequencing`, `media_utilities`, `visual_nodes`, `cpp_external_bridge`, `shader_post_processing`, `audio_pipeline`, `audio_visual_sync`, `ml_multimodal_pipeline`, `apple_native_features`, `camera_extension_output`, `auv3_audio_unit`, `extension_multi_output`
 - CI workflow for format and tests

@@ -685,6 +685,7 @@ fn documentation_index() -> Result<Value> {
             "api": "docs/api/README.md",
             "api_reference": "docs/api/reference.md",
             "schema_reference": "docs/api/schemas.md",
+            "compatibility": "docs/api/compatibility.md",
             "user_manual": "docs/manual/user-manual.md",
             "cli_reference": "docs/cli-reference.md",
             "ai_operation_guide": "docs/ai/operation-guide.md",

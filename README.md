@@ -215,6 +215,7 @@ AI agents should not infer device IDs by name, depend on GUI state, write vendor
 - [API Documentation](docs/api/README.md)
 - [API Reference](docs/api/reference.md)
 - [Schema Reference](docs/api/schemas.md)
+- [API Compatibility Notes](docs/api/compatibility.md)
 - [User Manual](docs/manual/user-manual.md)
 - [CLI Reference](docs/cli-reference.md)
 - [AI Operation Guide](docs/ai/operation-guide.md)

@@ -49,6 +49,7 @@ API and manual documentation:
 - [API Documentation](api/README.md)
 - [API Reference](api/reference.md)
 - [Schema Reference](api/schemas.md)
+- [API Compatibility Notes](api/compatibility.md)
 - [User Manual](manual/user-manual.md)
 
 Native plugin host commands:

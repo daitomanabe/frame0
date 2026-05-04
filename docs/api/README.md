@@ -24,9 +24,11 @@ agents, and third-party addons should depend on.
    contracts.
 2. Use [Schemas](schemas.md) when implementing validators, code generators, or
    external tools.
-3. Use [User Manual](../manual/user-manual.md) when running the scaffold as a
+3. Read [Compatibility](compatibility.md) before changing public CLI, schema, or
+   native ABI surfaces.
+4. Use [User Manual](../manual/user-manual.md) when running the scaffold as a
    creative runtime.
-4. Use the native docs under `docs/native/` when implementing C/C++ adapters.
+5. Use the native docs under `docs/native/` when implementing C/C++ adapters.
 
 The same map is available from the CLI:
 
