@@ -1,0 +1,456 @@
+name: analog_filter
+version: "0.1"
+runtime: frame0
+permissions:
+  camera: true
+  microphone: true
+  network: false
+  file_read: true
+  file_write: true
+clock:
+  primary: manual
+  fallback: monotonic
+  fixed_step_ns: 16666667
+inputs:
+  camera:
+    type: video.input
+    selector:
+      capability: video.input
+      vendor: frame0.mock
+    mode: 720p60
+    params:
+      native_source: apple.avfoundation.camera
+      session_preset: hd1280x720
+      pixel_format: bgra8
+      texture_bridge: CVMetalTextureCache
+      mirroring: true
+      orientation: landscape_right
+      source_rotation: 90_cw
+  microphone:
+    type: audio.input
+    selector:
+      capability: audio.input
+      vendor: frame0.mock
+    mode: stereo_48k
+    params:
+      native_source: apple.coreaudio.input
+      sample_rate: 48000
+      channels: 2
+      buffer_size: 1024
+      local_meter_only: true
+  feedback_history:
+    type: render.feedback_history
+    history: 2
+    pixel_format: rgba16f
+    params:
+      role: previous_processed_frame
+      reset_on_resize: true
+nodes:
+  audio_meter:
+    type: audio.analysis.meter
+    input: microphone.samples
+    params:
+      features: [rms_level, peak, transient, bass_envelope]
+      rms_gain: 9.0
+      peak_gain: 5.5
+      bass_gain: 22.0
+      transient_gain: 3.2
+      fast_release: 0.72
+      slow_release: 0.985
+      bass_smoothing: 0.985
+      outputs:
+        level: audioLevel
+        peak: audioPeak
+        transient: audioTransient
+        bass: audioBass
+  analog_settings:
+    type: parameter.preset_bank
+    params:
+      source_project: analog-filter
+      source_modules:
+        camera: Sources/AnalogFilterApp/CameraCapture.swift
+        audio: Sources/AnalogFilterApp/AudioMeter.swift
+        controls: Sources/AnalogFilterApp/ControlsPanel.swift
+        renderer: Sources/AnalogFilterApp/MetalRenderer.swift
+        shader: Sources/AnalogFilterApp/Resources/Shaders.metal
+      default_preset: broadcast_ntsc
+      ui:
+        title: Analog TV
+        subtitle: Webcam through a realtime Metal shader
+        rotation_choices: [90_cw, "0", "180", 90_ccw]
+        controls:
+          - { label: Effect, key: intensity, range: [0.0, 1.5] }
+          - { label: Render Scale, key: render_scale, range: [0.5, 1.0] }
+          - { label: Auto Optimize, key: auto_optimize, range: [0.0, 1.0] }
+          - { label: Effect Quality, key: effect_quality, range: [0.0, 1.0] }
+          - { label: RF Noise, key: noise, range: [0.0, 1.0] }
+          - { label: Tracking, key: tracking, range: [0.0, 1.0] }
+          - { label: Scanlines, key: scanlines, range: [0.0, 1.0] }
+          - { label: Color Bleed, key: color_bleed, range: [0.0, 1.0] }
+          - { label: Ghosting, key: ghosting, range: [0.0, 1.0] }
+          - { label: Curvature, key: curvature, range: [0.0, 1.0] }
+          - { label: Shadow Mask, key: shadow_mask, range: [0.0, 1.0] }
+          - { label: Saturation, key: saturation, range: [0.0, 1.4] }
+          - { label: Vertical Hold, key: vertical_hold, range: [0.0, 1.0] }
+          - { label: Tape Crease, key: tape_crease, range: [0.0, 1.0] }
+          - { label: Interlace, key: interlace, range: [0.0, 1.0] }
+          - { label: Hum Bars, key: hum_bars, range: [0.0, 1.0] }
+          - { label: Ringing, key: edge_ringing, range: [0.0, 1.0] }
+          - { label: Bloom, key: bloom, range: [0.0, 1.0] }
+          - { label: Dropouts, key: dropouts, range: [0.0, 1.0] }
+          - { label: RF Interference, key: rf_interference, range: [0.0, 1.0] }
+          - { label: Impulse Noise, key: impulse_noise, range: [0.0, 1.0] }
+          - { label: AGC Pumping, key: agc_pumping, range: [0.0, 1.0] }
+          - { label: Chroma Phase, key: chroma_phase_drift, range: [0.0, 1.0] }
+          - { label: Cross Color, key: cross_color, range: [0.0, 1.0] }
+          - { label: Chroma Noise, key: chroma_noise, range: [0.0, 1.0] }
+          - { label: Tape Scratches, key: tape_scratches, range: [0.0, 1.0] }
+          - { label: Head Switching, key: head_switching, range: [0.0, 1.0] }
+          - { label: Timebase Error, key: timebase_error, range: [0.0, 1.0] }
+          - { label: Misconvergence, key: rgb_misconvergence, range: [0.0, 1.0] }
+          - { label: Phosphor Flicker, key: phosphor_flicker, range: [0.0, 1.0] }
+          - { label: Signal Clamp, key: signal_clamp, range: [0.0, 1.0] }
+          - { label: Persistence, key: phosphor_persistence, range: [0.0, 1.0] }
+          - { label: Frame Smear, key: frame_smear, range: [0.0, 1.0] }
+          - { label: Burn-In, key: burn_in, range: [0.0, 1.0] }
+          - { label: Mic React, key: mic_reactivity, range: [0.0, 1.0] }
+      presets:
+        clean_crt:
+          intensity: 0.45
+          noise: 0.08
+          tracking: 0.05
+          scanlines: 0.55
+          color_bleed: 0.14
+          ghosting: 0.08
+          curvature: 0.28
+          shadow_mask: 0.42
+          saturation: 1.0
+          vertical_hold: 0.0
+          tape_crease: 0.02
+          interlace: 0.18
+          hum_bars: 0.04
+          edge_ringing: 0.18
+          bloom: 0.18
+          dropouts: 0.02
+          mic_reactivity: 0.24
+          rf_interference: 0.04
+          impulse_noise: 0.02
+          agc_pumping: 0.04
+          chroma_phase_drift: 0.06
+          cross_color: 0.08
+          chroma_noise: 0.04
+          tape_scratches: 0.0
+          head_switching: 0.02
+          timebase_error: 0.04
+          rgb_misconvergence: 0.18
+          phosphor_flicker: 0.14
+          signal_clamp: 0.10
+          phosphor_persistence: 0.20
+          frame_smear: 0.04
+          burn_in: 0.04
+          render_scale: 1.0
+          auto_optimize: 1.0
+          effect_quality: 0.70
+          source_rotation: 1.0
+        broadcast_ntsc:
+          intensity: 0.9
+          noise: 0.32
+          tracking: 0.42
+          scanlines: 0.72
+          color_bleed: 0.46
+          ghosting: 0.26
+          curvature: 0.36
+          shadow_mask: 0.58
+          saturation: 0.88
+          vertical_hold: 0.10
+          tape_crease: 0.28
+          interlace: 0.34
+          hum_bars: 0.22
+          edge_ringing: 0.38
+          bloom: 0.34
+          dropouts: 0.26
+          mic_reactivity: 0.55
+          rf_interference: 0.34
+          impulse_noise: 0.22
+          agc_pumping: 0.24
+          chroma_phase_drift: 0.38
+          cross_color: 0.32
+          chroma_noise: 0.30
+          tape_scratches: 0.18
+          head_switching: 0.36
+          timebase_error: 0.34
+          rgb_misconvergence: 0.28
+          phosphor_flicker: 0.26
+          signal_clamp: 0.34
+          phosphor_persistence: 0.30
+          frame_smear: 0.18
+          burn_in: 0.10
+          render_scale: 0.90
+          auto_optimize: 1.0
+          effect_quality: 0.82
+          source_rotation: 1.0
+        worn_vhs:
+          intensity: 1.18
+          noise: 0.66
+          tracking: 0.82
+          scanlines: 0.76
+          color_bleed: 0.72
+          ghosting: 0.48
+          curvature: 0.32
+          shadow_mask: 0.46
+          saturation: 0.72
+          vertical_hold: 0.22
+          tape_crease: 0.70
+          interlace: 0.46
+          hum_bars: 0.34
+          edge_ringing: 0.48
+          bloom: 0.42
+          dropouts: 0.62
+          mic_reactivity: 0.70
+          rf_interference: 0.30
+          impulse_noise: 0.34
+          agc_pumping: 0.36
+          chroma_phase_drift: 0.74
+          cross_color: 0.44
+          chroma_noise: 0.70
+          tape_scratches: 0.62
+          head_switching: 0.78
+          timebase_error: 0.76
+          rgb_misconvergence: 0.36
+          phosphor_flicker: 0.42
+          signal_clamp: 0.58
+          phosphor_persistence: 0.46
+          frame_smear: 0.40
+          burn_in: 0.18
+          render_scale: 0.86
+          auto_optimize: 1.0
+          effect_quality: 0.92
+          source_rotation: 1.0
+        bad_rf:
+          intensity: 1.35
+          noise: 0.92
+          tracking: 0.94
+          scanlines: 0.86
+          color_bleed: 0.86
+          ghosting: 0.72
+          curvature: 0.42
+          shadow_mask: 0.68
+          saturation: 0.62
+          vertical_hold: 0.38
+          tape_crease: 0.62
+          interlace: 0.58
+          hum_bars: 0.72
+          edge_ringing: 0.84
+          bloom: 0.24
+          dropouts: 0.86
+          mic_reactivity: 0.86
+          rf_interference: 0.92
+          impulse_noise: 0.78
+          agc_pumping: 0.74
+          chroma_phase_drift: 0.86
+          cross_color: 0.82
+          chroma_noise: 0.86
+          tape_scratches: 0.28
+          head_switching: 0.46
+          timebase_error: 0.68
+          rgb_misconvergence: 0.60
+          phosphor_flicker: 0.50
+          signal_clamp: 0.82
+          phosphor_persistence: 0.24
+          frame_smear: 0.26
+          burn_in: 0.06
+          render_scale: 0.78
+          auto_optimize: 1.0
+          effect_quality: 0.96
+          source_rotation: 1.0
+        mono_security:
+          intensity: 0.95
+          noise: 0.42
+          tracking: 0.36
+          scanlines: 0.86
+          color_bleed: 0.04
+          ghosting: 0.18
+          curvature: 0.25
+          shadow_mask: 0.7
+          saturation: 0.02
+          vertical_hold: 0.18
+          tape_crease: 0.18
+          interlace: 0.68
+          hum_bars: 0.40
+          edge_ringing: 0.58
+          bloom: 0.08
+          dropouts: 0.22
+          mic_reactivity: 0.46
+          rf_interference: 0.34
+          impulse_noise: 0.34
+          agc_pumping: 0.30
+          chroma_phase_drift: 0.02
+          cross_color: 0.02
+          chroma_noise: 0.04
+          tape_scratches: 0.16
+          head_switching: 0.20
+          timebase_error: 0.24
+          rgb_misconvergence: 0.08
+          phosphor_flicker: 0.36
+          signal_clamp: 0.52
+          phosphor_persistence: 0.62
+          frame_smear: 0.12
+          burn_in: 0.22
+          render_scale: 0.86
+          auto_optimize: 1.0
+          effect_quality: 0.62
+          source_rotation: 1.0
+  adaptive_render_scale:
+    type: render.adaptive_resolution
+    input: analog_settings.params
+    params:
+      min_scale: 0.5
+      max_scale: 1.0
+      quantize_step: 0.05
+      lower_fps_threshold: 52.0
+      upper_fps_threshold: 58.0
+      decrease_step: 0.03
+      increase_step: 0.012
+      reset_when_auto_optimize_disabled: true
+      flush_texture_cache_every_frames: 180
+  analog_tv:
+    type: render.post_process
+    inputs:
+      source: camera.video
+      previous: feedback_history.texture
+      audio: audio_meter.levels
+      settings: analog_settings.params
+      render_scale: adaptive_render_scale.scale
+    shader: shaders/analog/analog_tv.metal
+    pass: analogTVFragment
+    params:
+      vertex_function: fullscreenVertex
+      present_function: presentFragment
+      offscreen_pixel_format: rgba16f
+      output_pixel_format: bgra8
+      sampler: linear_clamp
+      input_layout: camera_aspect_fill
+      output_size: [1920, 1080]
+      fallback_when_feedback_allocation_fails: clear_drawable
+      uniforms:
+        - time
+        - intensity
+        - noise
+        - tracking
+        - scanlines
+        - colorBleed
+        - ghosting
+        - curvature
+        - shadowMask
+        - saturation
+        - inputWidth
+        - inputHeight
+        - outputWidth
+        - outputHeight
+        - verticalHold
+        - tapeCrease
+        - interlace
+        - humBars
+        - edgeRinging
+        - bloom
+        - dropouts
+        - sourceRotation
+        - audioLevel
+        - audioPeak
+        - audioTransient
+        - audioBass
+        - micReactivity
+        - rfInterference
+        - impulseNoise
+        - agcPumping
+        - chromaPhaseDrift
+        - crossColor
+        - chromaNoise
+        - tapeScratches
+        - headSwitching
+        - timebaseError
+        - rgbMisconvergence
+        - phosphorFlicker
+        - signalClamp
+        - phosphorPersistence
+        - frameSmear
+        - burnIn
+        - feedbackReady
+        - effectQuality
+      artifact_groups:
+        rf_broadcast_reception:
+          - weak_signal_snow
+          - impulse_noise_bursts
+          - multipath_echo_shimmer
+          - agc_exposure_pumping
+          - rolling_interference_bands
+        composite_ntsc_decoder:
+          - chroma_phase_drift
+          - cross_color_rainbow
+          - cross_luma_dot_texture
+          - chroma_crawl
+          - chroma_noise
+          - luma_chroma_delay
+        vhs_tape_transport:
+          - time_base_error_wobble
+          - head_switching_noise
+          - tape_crease_bands
+          - oxide_scratches
+          - dropout_bursts
+          - chroma_loss_on_damage
+        crt_display:
+          - scanlines
+          - interlace_shimmer
+          - shadow_mask
+          - rgb_misconvergence
+          - beam_softness
+          - bloom
+          - phosphor_flicker
+          - phosphor_persistence
+          - corner_vignette
+          - tube_edge_falloff
+        system_drift:
+          - horizontal_sync_wobble
+          - vertical_hold_roll
+          - black_level_lift
+          - white_clipping
+          - color_temperature_drift
+          - per_frame_instability
+        microphone_reactivity:
+          - level_reactive_snow
+          - level_reactive_bloom
+          - transient_sync_hits
+          - bass_horizontal_wobble
+          - audio_reactive_dropouts
+        temporal_feedback:
+          - previous_frame_ping_pong
+          - phosphor_persistence
+          - frame_smear
+          - retained_highlight_burn_in
+        optimization:
+          - render_scale
+          - auto_optimize
+          - effect_quality
+          - expensive_sample_skip
+          - texture_cache_flush
+  present:
+    type: render.present
+    input: analog_tv.texture
+    params:
+      pass: presentFragment
+      scale_mode: fill
+      color_space: rec709
+outputs:
+  preview:
+    type: screen
+    input: present.drawable
+  capture:
+    type: media.capture_sink
+    input: analog_tv.texture
+    params:
+      container: frames
+      codec: png16
+      path: captures/analog_filter/frame_%05d.png
+  events:
+    type: event.ndjson
+    input: analog_tv.events

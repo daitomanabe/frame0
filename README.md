@@ -134,6 +134,7 @@ Included extension examples:
 | `headless_render` | Deterministic headless render path |
 | `camera_to_shader` | Mock camera input to render shader |
 | `audio_reactive` | Mock audio input and FFT-driven shader path |
+| `analog_filter` | Camera and microphone reactive analog TV/VHS/CRT shader contract |
 | `mock_sdk_input` | Mock native SDK video/audio input scene |
 | `native_ml` | Native ML tensor/inference/overlay graph |
 | `creative_primitives` | Processing/openFrameworks-style draw primitive manifest |

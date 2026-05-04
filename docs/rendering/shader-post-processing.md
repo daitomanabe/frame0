@@ -8,6 +8,16 @@ The sample scene is:
 examples/shader_post_processing/scene.yaml
 ```
 
+A richer camera/audio-reactive shader contract is also available:
+
+```text
+examples/analog_filter/scene.yaml
+```
+
+It models the `analog-filter` Swift/Metal app as FRAME0 nodes: camera input,
+microphone metering, analog TV/VHS/CRT/RF artifact parameters, temporal
+feedback, presets, adaptive render scale, and present/capture outputs.
+
 Pass order:
 
 1. `source`: generate the base texture.
@@ -23,4 +33,6 @@ Verify:
 ```bash
 cargo run -p frame0_cli -- inspect examples/shader_post_processing/scene.yaml --json
 cargo run -p frame0_cli -- graph examples/shader_post_processing/scene.yaml --json
+cargo run -p frame0_cli -- inspect examples/analog_filter/scene.yaml --json
+cargo run -p frame0_cli -- graph examples/analog_filter/scene.yaml --json
 ```

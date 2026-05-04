@@ -40,7 +40,7 @@ This repository now contains a working FRAME0 v0.1 scaffold built from `frame0_a
 - Batch example launcher via `frame0 examples launch-all` writes every example launch plus `index.html`
 - Structured launch log reader via `frame0 logs --root <launch-dir> --tail <n>`
 - Addon registry validation helper and CI check via `scripts/verify_addon_registry.sh`
-- Examples: 31 CLI-verifiable scenes covering shader/rendering, audio, audio-visual sync, ML, Apple native APIs, native SDK bridges, projection mapping, multi-camera switching, depth point clouds, MIDI/OSC control, generative typography, dataset recording, extensions, and addon/external authoring patterns
+- Examples: 32 CLI-verifiable scenes covering shader/rendering, analog camera/audio-reactive filters, audio, audio-visual sync, ML, Apple native APIs, native SDK bridges, projection mapping, multi-camera switching, depth point clouds, MIDI/OSC control, generative typography, dataset recording, extensions, and addon/external authoring patterns
 - CI workflow for format and tests
 - Unit and integration tests
 
@@ -93,6 +93,8 @@ cargo run -q -p frame0_cli -- inspect examples/native_ml/scene.yaml --json
 cargo run -q -p frame0_cli -- inspect examples/camera_extension_output/scene.yaml --json
 cargo run -q -p frame0_cli -- inspect examples/auv3_audio_unit/scene.yaml --json
 cargo run -q -p frame0_cli -- inspect examples/extension_multi_output/scene.yaml --json
+cargo run -q -p frame0_cli -- inspect examples/analog_filter/scene.yaml --json
+cargo run -q -p frame0_cli -- examples launch analog_filter --frames 4 --out /tmp/frame0-analog-filter-launch --json
 cargo run -q -p frame0_cli -- examples list --json
 cargo run -q -p frame0_cli -- plugins verify plugins/camera_extension_stub/plugin.yaml --json
 cargo run -q -p frame0_cli -- plugins verify plugins/audio_unit_stub/plugin.yaml --json
