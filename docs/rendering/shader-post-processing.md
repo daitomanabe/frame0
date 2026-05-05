@@ -35,4 +35,5 @@ cargo run -p frame0_cli -- inspect examples/shader_post_processing/scene.yaml --
 cargo run -p frame0_cli -- graph examples/shader_post_processing/scene.yaml --json
 cargo run -p frame0_cli -- inspect examples/analog_filter/scene.yaml --json
 cargo run -p frame0_cli -- graph examples/analog_filter/scene.yaml --json
+cargo run -p frame0_cli -- scene controls examples/analog_filter/scene.yaml --json
 ```

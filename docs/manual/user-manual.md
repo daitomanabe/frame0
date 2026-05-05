@@ -33,7 +33,18 @@ cargo run -p frame0_cli -- graph examples/camera_to_shader/scene.yaml --json
 The graph output shows nodes, edges, diagnostics, and topological order. Use it
 before running complex media, ML, or extension scenes.
 
-## 4. Dry Run And Event Stream
+## 4. Inspect Control Surfaces
+
+```bash
+cargo run -p frame0_cli -- scene controls examples/analog_filter/scene.yaml --json
+```
+
+`scene controls` extracts parameter-heavy scene surfaces: UI controls, preset
+coverage, default values, shader uniforms, and artifact groups. Use it when
+porting large shader apps or checking that every preset covers every exposed
+control.
+
+## 5. Dry Run And Event Stream
 
 ```bash
 cargo run -p frame0_cli -- run examples/hello_shader/scene.yaml --dry-run --json
@@ -43,7 +54,7 @@ cargo run -p frame0_cli -- run examples/hello_shader/scene.yaml --events ndjson 
 Dry runs are useful for validation and automation. NDJSON events are useful for
 AI agents, regression tests, log capture, and timeline replay.
 
-## 5. Render Headlessly
+## 6. Render Headlessly
 
 ```bash
 cargo run -p frame0_cli -- render examples/headless_render/scene.yaml --frames 60 --json
@@ -53,7 +64,7 @@ The current renderer is a deterministic mock backend. Real Metal rendering,
 texture pooling, shader compilation, and GPU timing are intentionally future
 work behind the same CLI surface.
 
-## 6. Use Schemas
+## 7. Use Schemas
 
 ```bash
 cargo run -p frame0_cli -- schema list --json
@@ -63,7 +74,7 @@ cargo run -p frame0_cli -- schema export all --json
 Schemas are the contract for external tools and addon authors. Use them to
 validate generated scene manifests before running FRAME0.
 
-## 7. Explore Examples
+## 8. Explore Examples
 
 ```bash
 cargo run -p frame0_cli -- examples list --json
@@ -88,7 +99,7 @@ Important example groups:
 | Control | `input_events`, `midi_osc_control_surface`, `parameter_automation` |
 | Creative systems | `creative_primitives`, `cinder_geometry`, `operator_network`, `timeline_sequencing`, `projection_mapping`, `generative_typography` |
 
-## 8. Work With Native Plugins
+## 9. Work With Native Plugins
 
 ```bash
 cargo build -p frame0_mock_sdk
@@ -100,7 +111,7 @@ cargo run -p frame0_plugin_host -- stream-test plugins/mock/plugin.yaml --json
 Native plugins are isolated behind a C ABI and loaded by the plugin host. Keep
 vendor SDKs, C++ ABI types, and OS framework objects inside the adapter.
 
-## 9. Work With Native ML
+## 10. Work With Native ML
 
 ```bash
 cargo build -p frame0_mock_ml
@@ -112,7 +123,7 @@ The mock ML adapter demonstrates model description and inference packets. Future
 Core ML, MPSGraph, ANE, or vendor backends should preserve these runtime-facing
 contracts.
 
-## 10. Build Addons
+## 11. Build Addons
 
 Start from the Rust addon skeleton:
 
@@ -129,7 +140,7 @@ Addon packages should include:
 - at least one example scene
 - plugin or native external assets when needed
 
-## 11. AI-Assisted Development Loop
+## 12. AI-Assisted Development Loop
 
 Use this loop for automated development:
 
@@ -145,7 +156,7 @@ frame0 suggest fix path/to/scene.yaml --json
 Do not use plain text logs as the only source of truth when JSON or NDJSON is
 available.
 
-## 12. Verify Public Examples
+## 13. Verify Public Examples
 
 Before publishing changes to example scenes, run:
 
@@ -156,7 +167,7 @@ scripts/verify_examples.sh
 The script inspects every `examples/*/scene.yaml` and verifies that the CLI can
 generate the documented example index.
 
-## 13. Launch Example Artifacts
+## 14. Launch Example Artifacts
 
 Use `examples launch` when you want concrete files to inspect or open:
 
@@ -168,7 +179,7 @@ cargo run -p frame0_cli -- examples launch-all --frames 24 --out runs/examples -
 The launch command writes:
 
 - `preview.html`
-- `launch.json`
+- `launch.json` with graph, adapter status, and control-surface summary
 - `events.ndjson`
 - `frames.json`
 

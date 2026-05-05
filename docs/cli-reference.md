@@ -14,6 +14,7 @@ frame0 inspect examples/auv3_audio_unit/scene.yaml --json
 frame0 inspect examples/extension_multi_output/scene.yaml --json
 frame0 graph examples/hello_shader/scene.yaml --json
 frame0 graph diff before.yaml after.yaml --json
+frame0 scene controls examples/analog_filter/scene.yaml --json
 frame0 run examples/hello_shader/scene.yaml --dry-run --json
 frame0 run examples/hello_shader/scene.yaml --events ndjson --frames 3
 frame0 render examples/headless_render/scene.yaml --frames 60 --json
@@ -37,6 +38,7 @@ frame0 snapshot runtime --scene examples/hello_shader/scene.yaml --json
 frame0 explain error error.json --json
 frame0 suggest fix examples/hello_shader/scene.yaml --json
 frame0 scene patch scene.yaml patch.json --json
+frame0 scene controls examples/analog_filter/scene.yaml --json
 frame0 examples list --json
 frame0 examples run audio_visual_sync --frames 4
 frame0 examples launch projection_mapping --frames 120 --out runs/examples/projection_mapping --json

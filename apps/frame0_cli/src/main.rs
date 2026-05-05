@@ -9,13 +9,13 @@ use frame0_graph::build_graph;
 use frame0_plugin_api::{list_plugins, load_plugin_manifest, verify_plugin};
 use frame0_render::{empty_texture_pool_stats, render_capabilities, simulate_headless_frames};
 use frame0_schema::{
-    load_json_value, load_scene, schema_json, schema_names, ErrorEnvelope, Frame0Diagnostic,
-    SceneManifest,
+    load_json_value, load_scene, schema_json, schema_names, ComponentSpec, ErrorEnvelope,
+    Frame0Diagnostic, SceneManifest,
 };
 use frame0_time::DEFAULT_FIXED_STEP_NS;
 use serde::Serialize;
 use serde_json::{json, Value};
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 use std::fs;
 use std::path::{Path, PathBuf};
 
@@ -208,6 +208,9 @@ enum SceneCommand {
         patch: PathBuf,
         #[arg(long)]
         out: Option<PathBuf>,
+    },
+    Controls {
+        scene: PathBuf,
     },
 }
 
@@ -604,6 +607,322 @@ fn command_scene(command: SceneCommand, json_output: bool) -> Result<()> {
             }
             print_value(&report, json_output, "scene patch applied")
         }
+        SceneCommand::Controls { scene } => {
+            let scene_manifest = load_scene(&scene)?;
+            let report = scene_controls_report(&scene, &scene_manifest);
+            let summary = report.get("summary").and_then(Value::as_object);
+            let control_count = summary
+                .and_then(|item| item.get("control_count"))
+                .and_then(Value::as_u64)
+                .unwrap_or(0);
+            let preset_count = summary
+                .and_then(|item| item.get("preset_count"))
+                .and_then(Value::as_u64)
+                .unwrap_or(0);
+            let uniform_count = summary
+                .and_then(|item| item.get("uniform_count"))
+                .and_then(Value::as_u64)
+                .unwrap_or(0);
+            print_value(
+                &report,
+                json_output,
+                format!(
+                    "scene controls: {control_count} controls, {preset_count} presets, {uniform_count} uniforms"
+                ),
+            )
+        }
+    }
+}
+
+fn scene_controls_report(scene_path: &Path, scene: &SceneManifest) -> Value {
+    let mut diagnostics = Vec::new();
+    let mut control_nodes = Vec::new();
+    let mut shader_nodes = Vec::new();
+    let mut control_count = 0_usize;
+    let mut preset_count = 0_usize;
+    let mut uniform_count = 0_usize;
+    let mut artifact_group_count = 0_usize;
+    let mut artifact_count = 0_usize;
+
+    for (kind, id, component) in scene_components(scene) {
+        if is_control_surface(component) {
+            let (node_report, controls, presets) =
+                control_node_report(kind, id, component, &mut diagnostics);
+            control_count += controls;
+            preset_count += presets;
+            control_nodes.push(node_report);
+        }
+
+        if is_shader_surface(component) {
+            let (node_report, uniforms, groups, artifacts) =
+                shader_node_report(kind, id, component);
+            uniform_count += uniforms;
+            artifact_group_count += groups;
+            artifact_count += artifacts;
+            shader_nodes.push(node_report);
+        }
+    }
+
+    let ok = diagnostics.iter().all(|item| !is_error(item));
+    json!({
+        "scene": scene.name,
+        "scene_path": path_for_report(scene_path),
+        "ok": ok,
+        "control_nodes": control_nodes,
+        "shader_nodes": shader_nodes,
+        "summary": {
+            "control_node_count": control_nodes.len(),
+            "shader_node_count": shader_nodes.len(),
+            "control_count": control_count,
+            "preset_count": preset_count,
+            "uniform_count": uniform_count,
+            "artifact_group_count": artifact_group_count,
+            "artifact_count": artifact_count,
+            "diagnostic_count": diagnostics.len(),
+        },
+        "diagnostics": diagnostics,
+    })
+}
+
+fn scene_components<'a>(
+    scene: &'a SceneManifest,
+) -> Vec<(&'static str, &'a String, &'a ComponentSpec)> {
+    let mut components = Vec::new();
+    for (id, component) in &scene.inputs {
+        components.push(("input", id, component));
+    }
+    for (id, component) in &scene.nodes {
+        components.push(("node", id, component));
+    }
+    for (id, component) in &scene.outputs {
+        components.push(("output", id, component));
+    }
+    components
+}
+
+fn is_control_surface(component: &ComponentSpec) -> bool {
+    component.component_type == "parameter.preset_bank"
+        || component.params.contains_key("presets")
+        || component
+            .params
+            .get("ui")
+            .and_then(|ui| ui.get("controls"))
+            .is_some()
+}
+
+fn is_shader_surface(component: &ComponentSpec) -> bool {
+    component.shader.is_some()
+        || component.params.contains_key("uniforms")
+        || component.params.contains_key("artifact_groups")
+}
+
+fn control_node_report(
+    kind: &str,
+    id: &str,
+    component: &ComponentSpec,
+    diagnostics: &mut Vec<Frame0Diagnostic>,
+) -> (Value, usize, usize) {
+    let ui = component.params.get("ui");
+    let controls = ui
+        .and_then(|item| item.get("controls"))
+        .and_then(Value::as_array);
+    let presets = component.params.get("presets").and_then(Value::as_object);
+    let default_preset = component
+        .params
+        .get("default_preset")
+        .and_then(Value::as_str)
+        .map(str::to_string);
+    let preset_names: Vec<String> = presets
+        .map(|items| items.keys().cloned().collect())
+        .unwrap_or_default();
+
+    if let Some(default) = &default_preset {
+        if !preset_names.iter().any(|name| name == default) {
+            diagnostics.push(
+                Frame0Diagnostic::warning(
+                    "CONTROL_DEFAULT_PRESET_NOT_FOUND",
+                    format!("Control node '{id}' references missing default preset '{default}'"),
+                )
+                .with_resource(id),
+            );
+        }
+    }
+
+    let mut control_keys = BTreeSet::new();
+    let mut control_reports = Vec::new();
+    if let Some(controls) = controls {
+        for (index, control) in controls.iter().enumerate() {
+            let Some(key) = control.get("key").and_then(report_string) else {
+                diagnostics.push(
+                    Frame0Diagnostic::warning(
+                        "CONTROL_KEY_MISSING",
+                        format!("Control node '{id}' has a control without a key at index {index}"),
+                    )
+                    .with_resource(id),
+                );
+                continue;
+            };
+            control_keys.insert(key.clone());
+
+            let label = control
+                .get("label")
+                .and_then(report_string)
+                .unwrap_or_else(|| key.clone());
+            let (range_min, range_max, range_valid) = numeric_range(control.get("range"));
+            if control.get("range").is_some() && !range_valid {
+                diagnostics.push(
+                    Frame0Diagnostic::warning(
+                        "CONTROL_RANGE_INVALID",
+                        format!("Control '{key}' on node '{id}' has a non-numeric range"),
+                    )
+                    .with_resource(id),
+                );
+            }
+
+            let mut present_in_presets = Vec::new();
+            let mut missing_in_presets = Vec::new();
+            if let Some(presets) = presets {
+                for (preset_name, preset_value) in presets {
+                    if preset_value.get(&key).is_some() {
+                        present_in_presets.push(preset_name.clone());
+                    } else {
+                        missing_in_presets.push(preset_name.clone());
+                    }
+                }
+            }
+
+            let default_value = default_preset
+                .as_ref()
+                .and_then(|preset| presets.and_then(|items| items.get(preset)))
+                .and_then(|preset| preset.get(&key))
+                .cloned();
+
+            control_reports.push(json!({
+                "key": key,
+                "label": label,
+                "range": control.get("range").cloned().unwrap_or(Value::Null),
+                "range_min": range_min,
+                "range_max": range_max,
+                "range_valid": range_valid,
+                "default_value": default_value,
+                "present_in_presets": present_in_presets,
+                "missing_in_presets": missing_in_presets,
+            }));
+        }
+    }
+
+    let mut preset_reports = Vec::new();
+    if let Some(presets) = presets {
+        for (preset_name, preset_value) in presets {
+            let preset_keys: BTreeSet<String> = preset_value
+                .as_object()
+                .map(|values| values.keys().cloned().collect())
+                .unwrap_or_default();
+            let missing_controls: Vec<String> =
+                control_keys.difference(&preset_keys).cloned().collect();
+            let uncontrolled_values: Vec<String> =
+                preset_keys.difference(&control_keys).cloned().collect();
+            preset_reports.push(json!({
+                "name": preset_name,
+                "value_count": preset_keys.len(),
+                "coverage": if missing_controls.is_empty() { "complete" } else { "partial" },
+                "missing_controls": missing_controls,
+                "uncontrolled_values": uncontrolled_values,
+            }));
+        }
+    }
+
+    (
+        json!({
+            "id": id,
+            "kind": kind,
+            "type": component.component_type,
+            "default_preset": default_preset,
+            "source_project": component.params.get("source_project").cloned(),
+            "source_modules": component.params.get("source_modules").cloned(),
+            "rotation_choices": ui
+                .and_then(|item| item.get("rotation_choices"))
+                .cloned(),
+            "control_count": control_reports.len(),
+            "preset_count": preset_reports.len(),
+            "controls": control_reports,
+            "presets": preset_reports,
+        }),
+        control_keys.len(),
+        preset_names.len(),
+    )
+}
+
+fn shader_node_report(
+    kind: &str,
+    id: &str,
+    component: &ComponentSpec,
+) -> (Value, usize, usize, usize) {
+    let uniforms = string_array(component.params.get("uniforms"));
+    let mut artifact_groups = Vec::new();
+    let mut artifact_count = 0_usize;
+
+    if let Some(groups) = component
+        .params
+        .get("artifact_groups")
+        .and_then(Value::as_object)
+    {
+        for (name, value) in groups {
+            let artifacts = string_array(Some(value));
+            artifact_count += artifacts.len();
+            artifact_groups.push(json!({
+                "name": name,
+                "count": artifacts.len(),
+                "artifacts": artifacts,
+            }));
+        }
+    }
+
+    let group_count = artifact_groups.len();
+    let uniform_count = uniforms.len();
+    (
+        json!({
+            "id": id,
+            "kind": kind,
+            "type": component.component_type,
+            "shader": component.shader,
+            "pass": component.extra.get("pass").cloned(),
+            "uniform_count": uniform_count,
+            "uniforms": uniforms,
+            "artifact_group_count": group_count,
+            "artifact_count": artifact_count,
+            "artifact_groups": artifact_groups,
+        }),
+        uniform_count,
+        group_count,
+        artifact_count,
+    )
+}
+
+fn numeric_range(value: Option<&Value>) -> (Option<f64>, Option<f64>, bool) {
+    match value.and_then(Value::as_array) {
+        Some(items) if items.len() == 2 => {
+            let min = items[0].as_f64();
+            let max = items[1].as_f64();
+            (min, max, min.is_some() && max.is_some())
+        }
+        Some(_) => (None, None, false),
+        None => (None, None, true),
+    }
+}
+
+fn string_array(value: Option<&Value>) -> Vec<String> {
+    value
+        .and_then(Value::as_array)
+        .map(|items| items.iter().filter_map(report_string).collect())
+        .unwrap_or_default()
+}
+
+fn report_string(value: &Value) -> Option<String> {
+    match value {
+        Value::String(item) => Some(item.clone()),
+        Value::Number(_) | Value::Bool(_) => Some(value.to_string()),
+        _ => None,
     }
 }
 
@@ -709,6 +1028,7 @@ fn launch_example(name: &str, frames: u64, output_dir: &Path) -> Result<Value> {
     let rendered_frames = simulate_headless_frames(frames, step_ns, 1920, 1080);
     let run_events = simulated_run_events(&scene, frames);
     let adapter_status = example_adapter_status(&scene);
+    let control_surface = scene_controls_report(&scene_path, &scene);
     let launch_report = json!({
         "example": name,
         "scene_path": path_for_report(&scene_path),
@@ -729,6 +1049,7 @@ fn launch_example(name: &str, frames: u64, output_dir: &Path) -> Result<Value> {
         "render_frames": rendered_frames.clone(),
         "devices": mock_devices(),
         "adapter_status": adapter_status.clone(),
+        "control_surface": control_surface,
     });
 
     let launch_path = output_dir.join("launch.json");
@@ -921,6 +1242,7 @@ fn documentation_index() -> Result<Value> {
                 "explain",
                 "suggest",
                 "scene patch",
+                "scene controls",
                 "examples",
                 "examples launch",
                 "examples launch-all",
@@ -1099,10 +1421,15 @@ fn example_preview_html(name: &str, scene: &SceneManifest, report: &Value) -> Re
         .get("adapter_status")
         .cloned()
         .unwrap_or_else(|| json!([]));
+    let controls = report
+        .get("control_surface")
+        .cloned()
+        .unwrap_or_else(|| json!({}));
     let outputs = serde_json::to_string_pretty(&scene.outputs)?;
     let graph_json = serde_json::to_string_pretty(&graph)?;
     let events_json = serde_json::to_string_pretty(&events)?;
     let adapters_json = serde_json::to_string_pretty(&adapters)?;
+    let controls_json = serde_json::to_string_pretty(&controls)?;
     Ok(format!(
         r#"<!doctype html>
 <html lang="en">
@@ -1212,6 +1539,10 @@ pre {{
       <pre>{adapters}</pre>
     </section>
     <section>
+      <h2>Controls</h2>
+      <pre>{controls}</pre>
+    </section>
+    <section>
       <h2>Graph</h2>
       <pre>{graph}</pre>
     </section>
@@ -1228,6 +1559,7 @@ pre {{
         title = html_escape(&scene.name),
         outputs = html_escape(&outputs),
         adapters = html_escape(&adapters_json),
+        controls = html_escape(&controls_json),
         graph = html_escape(&graph_json),
         events = html_escape(&events_json),
     ))

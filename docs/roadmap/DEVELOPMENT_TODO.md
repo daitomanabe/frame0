@@ -14,6 +14,7 @@ should be implemented as a small, reviewable change with tests and a push.
 - [x] Add deterministic example launch artifacts with HTML preview, launch JSON, frames JSON, and NDJSON events.
 - [x] Add batch example launcher and generated HTML index for all examples.
 - [x] Add an AI agent operation guide for schema-first editing, dry runs, NDJSON execution, logs, native plugins, ML, and Apple extension examples.
+- [x] Add scene control-surface extraction for parameter-heavy shader examples.
 
 ## Runtime And IPC
 

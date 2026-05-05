@@ -15,6 +15,7 @@ frame0 doctor --json
 frame0 inspect examples/hello_shader/scene.yaml --json
 frame0 graph examples/hello_shader/scene.yaml --json
 frame0 graph diff before.yaml after.yaml --json
+frame0 scene controls examples/analog_filter/scene.yaml --json
 frame0 run examples/hello_shader/scene.yaml --dry-run --json
 frame0 run examples/hello_shader/scene.yaml --events ndjson --frames 3
 frame0 render examples/headless_render/scene.yaml --frames 60 --json

@@ -10,7 +10,7 @@ This repository is an executable v0.1 scaffold. It already builds and tests the 
 
 Implemented now:
 
-- CLI with JSON output for inspection, graph extraction, dry runs, snapshots, schemas, examples, diagnostics, and plugin verification
+- CLI with JSON output for inspection, graph extraction, control-surface extraction, dry runs, snapshots, schemas, examples, diagnostics, and plugin verification
 - NDJSON runtime event stream for AI agents and automated tooling
 - Scene, plugin, resource, packet, graph, runtime, permission, extension, ML model, and inference JSON schemas
 - Static scene validation and graph topological ordering
@@ -22,7 +22,7 @@ Implemented now:
 - Plugin crash detection and restart supervision smoke path
 - Stream open/start/callback/stop/close smoke path with frame/audio packet capture
 - Native ML plugin contract with deterministic mock inference output
-- Deterministic example launcher that writes runnable HTML previews, launch reports, frame reports, and NDJSON events
+- Deterministic example launcher that writes runnable HTML previews, launch reports with control-surface summaries, frame reports, and NDJSON events
 - Core Media I/O Camera Extension, AUv3, and Syphon-style output example manifests
 - Unit and integration tests for the CLI, plugin host, native mock SDK, and native mock ML adapter
 
@@ -50,6 +50,7 @@ Inspect a scene:
 ```bash
 cargo run -p frame0_cli -- inspect examples/hello_shader/scene.yaml --json
 cargo run -p frame0_cli -- graph examples/camera_to_shader/scene.yaml --json
+cargo run -p frame0_cli -- scene controls examples/analog_filter/scene.yaml --json
 cargo run -p frame0_cli -- run examples/hello_shader/scene.yaml --dry-run --json
 cargo run -p frame0_cli -- run examples/hello_shader/scene.yaml --events ndjson --frames 3
 ```

@@ -6,7 +6,7 @@ This repository now contains a working FRAME0 v0.1 scaffold built from `frame0_a
 
 ## Implemented
 
-- CLI skeleton: `frame0 --version`, `new`, `inspect`, `graph`, `run`, `render`, `devices`, `plugins`, `resources`, `resource`, `doctor`, `schema`, `snapshot`, `explain`, `suggest`, `scene patch`, `examples`, `benchmark`, `logs`
+- CLI skeleton: `frame0 --version`, `new`, `inspect`, `graph`, `run`, `render`, `devices`, `plugins`, `resources`, `resource`, `doctor`, `schema`, `snapshot`, `explain`, `suggest`, `scene patch`, `scene controls`, `examples`, `benchmark`, `logs`
 - JSON output for operational commands
 - NDJSON event stream: `frame0 run <scene> --events ndjson`
 - JSON Schema v0 exports for scene, plugin, resource, device, capability, packets, events, errors, runtime snapshot, graph, parameter, and permissions
@@ -30,13 +30,14 @@ This repository now contains a working FRAME0 v0.1 scaffold built from `frame0_a
 - C++ SDK adapter interface
 - Native external C ABI skeleton and C/C++ external templates
 - AI agent operation guide, error explanation, fix suggestions, graph diff, and merge-patch helper
+- Scene control-surface extraction for parameter-heavy shader examples, including controls, presets, uniforms, and artifact groups
 - Public API documentation, schema reference, user manual, and development TODO checklist
 - Machine-readable documentation index via `frame0 docs index --json` and example documentation listing via `frame0 docs examples --json`
 - API compatibility notes for schema, CLI JSON, NDJSON, and native ABI changes
 - Repository example verification helper via `scripts/verify_examples.sh`
 - Addon skeleton generator via `frame0 new <path> --kind addon-rust`
 - Expanded examples for projection mapping, multi-camera switching, depth point clouds, MIDI/OSC control, generative typography, dataset recording, Core ML style transfer, and spatial audio visualization
-- Example launcher via `frame0 examples launch <name>` writes `preview.html`, `launch.json`, `events.ndjson`, and `frames.json`
+- Example launcher via `frame0 examples launch <name>` writes `preview.html`, `launch.json`, `events.ndjson`, and `frames.json`, including control-surface summaries in launch artifacts
 - Batch example launcher via `frame0 examples launch-all` writes every example launch plus `index.html`
 - Structured launch log reader via `frame0 logs --root <launch-dir> --tail <n>`
 - Addon registry validation helper and CI check via `scripts/verify_addon_registry.sh`
@@ -94,6 +95,7 @@ cargo run -q -p frame0_cli -- inspect examples/camera_extension_output/scene.yam
 cargo run -q -p frame0_cli -- inspect examples/auv3_audio_unit/scene.yaml --json
 cargo run -q -p frame0_cli -- inspect examples/extension_multi_output/scene.yaml --json
 cargo run -q -p frame0_cli -- inspect examples/analog_filter/scene.yaml --json
+cargo run -q -p frame0_cli -- scene controls examples/analog_filter/scene.yaml --json
 cargo run -q -p frame0_cli -- examples launch analog_filter --frames 4 --out /tmp/frame0-analog-filter-launch --json
 cargo run -q -p frame0_cli -- examples list --json
 cargo run -q -p frame0_cli -- plugins verify plugins/camera_extension_stub/plugin.yaml --json

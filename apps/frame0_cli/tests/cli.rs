@@ -44,6 +44,23 @@ fn graph_outputs_nodes() {
 }
 
 #[test]
+fn scene_controls_reports_analog_filter_surface() {
+    let scene = repo_path("examples/analog_filter/scene.yaml");
+    Command::cargo_bin("frame0")
+        .unwrap()
+        .args(["scene", "controls", scene.as_str(), "--json"])
+        .assert()
+        .success()
+        .stdout(predicate::str::contains("\"ok\": true"))
+        .stdout(predicate::str::contains("\"control_count\": 35"))
+        .stdout(predicate::str::contains("\"preset_count\": 5"))
+        .stdout(predicate::str::contains("\"uniform_count\": 44"))
+        .stdout(predicate::str::contains("\"artifact_count\": 47"))
+        .stdout(predicate::str::contains("broadcast_ntsc"))
+        .stdout(predicate::str::contains("analogTVFragment"));
+}
+
+#[test]
 fn dry_run_outputs_snapshot() {
     let scene = repo_path("examples/hello_shader/scene.yaml");
     Command::cargo_bin("frame0")
@@ -132,9 +149,13 @@ fn examples_launch_writes_preview_artifacts() {
     assert!(out_dir.join("frames.json").is_file());
     assert!(out_dir.join("preview.html").is_file());
 
+    let launch = fs::read_to_string(out_dir.join("launch.json")).unwrap();
+    assert!(launch.contains("\"control_surface\""));
+
     let preview = fs::read_to_string(out_dir.join("preview.html")).unwrap();
     assert!(preview.contains("FRAME0 Example Launch"));
     assert!(preview.contains("projection_mapping"));
+    assert!(preview.contains("Controls"));
 }
 
 #[test]
@@ -253,7 +274,7 @@ fn all_examples_inspect_cleanly() {
         }
     }
     scenes.sort();
-    assert!(scenes.len() >= 31, "expected rich example coverage");
+    assert!(scenes.len() >= 32, "expected rich example coverage");
 
     for scene in scenes {
         Command::cargo_bin("frame0")
