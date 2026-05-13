@@ -238,6 +238,7 @@ AI agents should not infer device IDs by name, depend on GUI state, write vendor
 - [User Manual](docs/manual/user-manual.md)
 - [CLI Reference](docs/cli-reference.md)
 - [AI Agent Operation Guide](docs/ai/operation-guide.md)
+- [Claude Code Handoff](docs/handoff/CLAUDE_CODE_HANDOFF.md)
 - [Native C ABI Reference](docs/native/c-abi-reference.md)
 - [Native External C ABI](docs/native/external-c-abi.md)
 - [C++ Integration Mechanism](docs/native/cpp-integration.md)

@@ -15,6 +15,7 @@ should be implemented as a small, reviewable change with tests and a push.
 - [x] Add batch example launcher and generated HTML index for all examples.
 - [x] Add an AI agent operation guide for schema-first editing, dry runs, NDJSON execution, logs, native plugins, ML, and Apple extension examples.
 - [x] Add scene control-surface extraction for parameter-heavy shader examples.
+- [x] Add Claude Code handoff for the next native-runtime development phase.
 
 ## Runtime And IPC
 
